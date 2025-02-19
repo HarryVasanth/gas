@@ -6,8 +6,10 @@
     <title>Devo Abastecer - Preços de Combustíveis na Madeira</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="manifest" href="manifest.json" />
-    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
   </head>
+
   <body>
     <div id="app">
       <h1>Devo Abastecer</h1>
@@ -15,6 +17,9 @@
       <div id="current-prices"></div>
       <h2>Histórico de Preços</h2>
       <div id="historical-prices"></div>
+      <div id="history-chart-container">
+        <canvas id="priceHistoryChart"></canvas>
+      </div>
     </div>
     <script src="app.js"></script>
   </body>
