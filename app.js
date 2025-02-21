@@ -25,10 +25,27 @@ function formatPrice(current, previous) {
 
 function displayCurrentPrices(data) {
   const currentPricesDiv = document.getElementById("current-prices");
-  let html =
-    "<table><tr><th>Tipo de Combustível</th><th>Preço Atual vs Anterior</th></tr>";
+  const currentStartDate = new Date(data.current["Start date"]);
+  const currentEndDate = new Date(data.current["End date"]);
+  const previousDate = new Date(data.previous["Start date"]);
 
-  for (const [fuelType, price] of Object.entries(data.current.Gas)) {
+  // Format the date range
+  const formattedStartDate = currentStartDate.toLocaleDateString("pt-PT");
+  const formattedEndDate = currentEndDate.toLocaleDateString("pt-PT");
+
+  // Update the h2 element with the new date range
+  const h2Element = document.querySelector("h2");
+  h2Element.textContent = `Preços Atuais (${formattedStartDate} - ${formattedEndDate})`;
+
+  let html = `<table><tr><th>Tipo de Combustível</th><th>Preço ${currentStartDate.toLocaleDateString(
+    "pt-PT"
+  )} vs ${previousDate.toLocaleDateString("pt-PT")}</th></tr>`;
+
+  const sortedEntries = Object.entries(data.current.Gas).sort((a, b) =>
+    a[0].localeCompare(b[0])
+  );
+
+  for (const [fuelType, price] of sortedEntries) {
     const previousPrice = data.previous.Gas[fuelType];
     html += `<tr><td>${fuelType}</td><td>${formatPrice(
       price,
@@ -43,7 +60,7 @@ function displayCurrentPrices(data) {
 function displayHistoricalPrices(data) {
   const historicalPricesDiv = document.getElementById("historical-prices");
   let html =
-    "<table><tr><th>Data</th><th>Gasolina IO95</th><th>Gasóleo Rodoviário</th><th>Gasóleo Colorido e Marcado</th><th>Gasolina IO98</th></tr>";
+    "<table><tr><th>Data</th><th>Gasolina IO95</th><th>Gasolina IO98</th><th>Gasóleo Rodoviário</th><th>Gasóleo Colorido e Marcado</th></tr>";
 
   const sortedDates = Object.keys(data).sort(
     (a, b) => new Date(b) - new Date(a)
@@ -54,9 +71,9 @@ function displayHistoricalPrices(data) {
     html += `<tr><td>${priceData["Start date"]}</td>`;
     for (const fuelType of [
       "Gasolina IO95",
+      "Gasolina IO98",
       "Gasóleo Rodoviário",
       "Gasóleo Colorido e Marcado",
-      "Gasolina IO98",
     ]) {
       html += `<td>${priceData.Gas[fuelType].toFixed(3)}€</td>`;
     }
@@ -92,6 +109,7 @@ function renderHistoryChart(historyData) {
           data: historyData.prices,
           borderColor: "#4CAF50",
           tension: 0.1,
+          pointRadius: 0.1,
         },
       ],
     },
@@ -111,15 +129,15 @@ async function loadData() {
   // Create dataset structure
   const fuelTypes = [
     "Gasolina IO95",
+    "Gasolina IO98",
     "Gasóleo Rodoviário",
     "Gasóleo Colorido e Marcado",
-    "Gasolina IO98",
   ];
   const colors = {
     "Gasolina IO95": "rgb(255, 99, 132)",
+    "Gasolina IO98": "rgb(75, 192, 192)",
     "Gasóleo Rodoviário": "rgb(54, 162, 235)",
     "Gasóleo Colorido e Marcado": "rgb(255, 205, 86)",
-    "Gasolina IO98": "rgb(75, 192, 192)",
   };
 
   fuelTypes.forEach((fuel) => {
@@ -130,6 +148,7 @@ async function loadData() {
       ),
       borderColor: colors[fuel],
       tension: 0.1,
+      pointRadius: 0.1,
     });
   });
 
@@ -144,19 +163,19 @@ async function loadData() {
       responsive: true,
       interaction: {
         mode: "index",
-        intersect: false,
+        intersect: true,
       },
       scales: {
         x: {
           title: {
-            display: true,
+            display: false,
             text: "Date",
           },
         },
         y: {
           title: {
             display: true,
-            text: "Price (€/L)",
+            text: "Preço (€/L)",
           },
         },
       },
