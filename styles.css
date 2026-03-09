@@ -229,42 +229,6 @@ tr:last-child td {
   border-bottom: none;
 }
 
-/* Pagination */
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 24px;
-}
-
-.btn {
-  background-color: var(--card-bg);
-  color: var(--text-color);
-  border: 1px solid var(--border-color);
-  padding: 8px 16px;
-  border-radius: 12px;
-  font-weight: 600;
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn:hover:not(:disabled) {
-  background-color: var(--border-color);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.page-info {
-  font-size: 0.85rem;
-  color: var(--secondary-text);
-  font-weight: 500;
-}
-
 /* Footer */
 .app-footer {
   text-align: center;
@@ -284,7 +248,7 @@ tr:last-child td {
   to { opacity: 1; transform: translateY(0); }
 }
 
-.price-card, #history-chart-container, .table-container, .pagination {
+.price-card, #history-chart-container, .table-container {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
@@ -304,7 +268,7 @@ tr:last-child td {
 
   th, td {
     padding: 12px;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
   }
 }
 
