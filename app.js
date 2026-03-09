@@ -7,7 +7,7 @@ const FUEL_TYPES = [
   "Gasolina IO95",
   "Gasolina IO98",
   "Gasóleo Rodoviário",
-  "Gasóleo Colorido e Marcado",
+  "Gasóleo Colorido",
 ];
 
 const COLORS = {
@@ -23,7 +23,7 @@ const COLORS = {
     border: "#ff5252",
     bg: "rgba(255, 82, 82, 0.05)",
   },
-  "Gasóleo Colorido e Marcado": {
+  "Gasóleo Colorido": {
     border: "#6c5ce7",
     bg: "rgba(108, 92, 231, 0.05)",
   },
@@ -31,6 +31,9 @@ const COLORS = {
 
 let chart = null;
 let currentTheme = 'system';
+let chartData = null;
+let currentPage = 1;
+const ITEMS_PER_PAGE = 10;
 
 // --- Theme Management ---
 function updateThemeIcon() {
@@ -122,10 +125,10 @@ function displayCurrentPrices(data) {
   const currentGas = data.current.Gas;
   const previousGas = data.previous.Gas;
   const startDate = new Date(data.current["Start date"]).toLocaleDateString(
-    "pt-PT", { day: '2-digit', month: 'short' }
+    "pt-PT", { day: '2-digit', month: '2-digit', year: 'numeric' }
   );
   const endDate = new Date(data.current["End date"]).toLocaleDateString(
-    "pt-PT", { day: '2-digit', month: 'short' }
+    "pt-PT", { day: '2-digit', month: '2-digit', year: 'numeric' }
   );
 
   document.getElementById(
@@ -139,6 +142,7 @@ function displayCurrentPrices(data) {
   );
 
   for (const [fuelType, price] of sortedEntries) {
+    const shortenedFuelType = fuelType === "Gasóleo Colorido e Marcado" ? "Gasóleo Colorido" : fuelType;
     const previousPrice = previousGas[fuelType];
     const { current, icon, diffText, colorClass } = formatPriceDiff(
       price,
@@ -147,7 +151,7 @@ function displayCurrentPrices(data) {
 
     html += `
       <div class="price-card">
-        <div class="fuel-type">${fuelType}</div>
+        <div class="fuel-type">${shortenedFuelType}</div>
         <div class="price-value">
           <span class="main-price">${current}</span>
           <span class="price-icon ${colorClass}">${icon}</span>
@@ -160,11 +164,15 @@ function displayCurrentPrices(data) {
   container.innerHTML = html;
 }
 
-function displayHistoricalTable(data) {
+function displayHistoricalTable(data, page = 1) {
   const container = document.getElementById("historical-prices");
   const sortedDates = Object.keys(data).sort(
     (a, b) => new Date(b) - new Date(a)
   );
+
+  const totalPages = Math.ceil(sortedDates.length / ITEMS_PER_PAGE);
+  const startIdx = (page - 1) * ITEMS_PER_PAGE;
+  const pageDates = sortedDates.slice(startIdx, startIdx + ITEMS_PER_PAGE);
 
   let html = `
     <div class="table-container">
@@ -178,20 +186,48 @@ function displayHistoricalTable(data) {
         <tbody>
   `;
 
-  for (const date of sortedDates.slice(0, 10)) {
+  for (const date of pageDates) {
     const priceData = data[date];
     html += `<tr><td>${new Date(priceData["Start date"]).toLocaleDateString(
-      "pt-PT", { day: '2-digit', month: 'short' }
+      "pt-PT", { day: '2-digit', month: '2-digit', year: 'numeric' }
     )}</td>`;
     for (const fuelType of FUEL_TYPES) {
-      const price = priceData.Gas?.[fuelType] || priceData.Fuel?.[fuelType];
+      // Handle shortened name vs original name in data
+      const dataFuelType = fuelType === "Gasóleo Colorido" ? "Gasóleo Colorido e Marcado" : fuelType;
+      const price = priceData.Gas?.[dataFuelType] || priceData.Fuel?.[dataFuelType];
       html += `<td>${price ? price.toFixed(3) + "€" : "-"}</td>`;
     }
     html += "</tr>";
   }
 
   html += "</tbody></table></div>";
+
+  // Pagination UI
+  if (totalPages > 1) {
+    html += `
+      <div class="pagination">
+        <button id="prev-page" class="btn" ${page === 1 ? 'disabled' : ''}>Anterior</button>
+        <span class="page-info">Página ${page} de ${totalPages}</span>
+        <button id="next-page" class="btn" ${page === totalPages ? 'disabled' : ''}>Próxima</button>
+      </div>
+    `;
+  }
+
   container.innerHTML = html;
+
+  // Add event listeners for pagination
+  if (totalPages > 1) {
+    document.getElementById("prev-page").addEventListener("click", () => {
+      currentPage--;
+      displayHistoricalTable(data, currentPage);
+      document.getElementById("history-section").scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+    document.getElementById("next-page").addEventListener("click", () => {
+      currentPage++;
+      displayHistoricalTable(data, currentPage);
+      document.getElementById("history-section").scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }
 }
 
 function renderChart(data) {
@@ -210,10 +246,12 @@ function renderChart(data) {
     gradient.addColorStop(0, isDark ? `${color}33` : `${color}1A`);
     gradient.addColorStop(1, 'transparent');
 
+    const dataFuelType = fuel === "Gasóleo Colorido" ? "Gasóleo Colorido e Marcado" : fuel;
+
     return {
       label: fuel,
       data: dates.map(
-        (date) => data[date].Gas?.[fuel] || data[date].Fuel?.[fuel]
+        (date) => data[date].Gas?.[dataFuelType] || data[date].Fuel?.[dataFuelType]
       ),
       borderColor: color,
       backgroundColor: gradient,
@@ -230,7 +268,7 @@ function renderChart(data) {
   chart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: dates.map((d) => new Date(d).toLocaleDateString("pt-PT", { day: '2-digit', month: 'short' })),
+      labels: dates.map((d) => new Date(d).toLocaleDateString("pt-PT", { day: '2-digit', month: '2-digit', year: 'numeric' })),
       datasets: datasets,
     },
     options: {
@@ -253,7 +291,7 @@ function renderChart(data) {
             color: textColor,
             maxTicksLimit: 6,
             maxRotation: 0,
-            font: { size: 11 }
+            font: { size: 10 }
           },
         },
         y: {
@@ -303,8 +341,6 @@ function renderChart(data) {
   });
 }
 
-let chartData = null;
-
 async function init() {
   // Load saved theme
   const savedTheme = localStorage.getItem("theme");
@@ -333,7 +369,7 @@ async function init() {
 
     chartData = historicalData;
     displayCurrentPrices(currentData);
-    displayHistoricalTable(historicalData);
+    displayHistoricalTable(historicalData, currentPage);
     renderChart(historicalData);
   } catch (error) {
     console.error("Error loading data:", error);
