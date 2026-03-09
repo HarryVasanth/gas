@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Consulte os preços atuais e o histórico de combustíveis na Região Autónoma da Madeira. Saiba se deve abastecer agora ou esperar." />
     <title>Devo Abastecer - Preços de Combustíveis na Madeira</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="manifest" href="manifest.json" />
@@ -11,16 +12,24 @@
   </head>
 
   <body>
-    <div id="app">
-      <h1>⛽️ Devo Abastecer</h1>
-      <h2>Preços Atuais (17/02/2025 - 23/02/2025)</h2>
-      <div id="current-prices"></div>
-      <h2>Histórico de Preços</h2>
-      <div id="historical-prices"></div>
-      <div id="history-chart-container">
-        <canvas id="priceHistoryChart"></canvas>
-      </div>
-    </div>
+    <main id="app">
+      <header>
+        <h1>⛽️ Devo Abastecer</h1>
+      </header>
+
+      <section aria-labelledby="current-prices-heading">
+        <h2 id="current-prices-heading">Preços Atuais</h2>
+        <div id="current-prices"></div>
+      </section>
+
+      <section aria-labelledby="history-heading">
+        <h2 id="history-heading">Histórico de Preços</h2>
+        <div id="history-chart-container" role="region" aria-label="Gráfico de histórico de preços">
+          <canvas id="priceHistoryChart"></canvas>
+        </div>
+        <div id="historical-prices"></div>
+      </section>
+    </main>
     <script src="app.js"></script>
   </body>
 </html>
