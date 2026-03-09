@@ -341,6 +341,8 @@ function renderChart(data) {
   });
 }
 
+let chartData = null;
+
 async function init() {
   // Load saved theme
   const savedTheme = localStorage.getItem("theme");
