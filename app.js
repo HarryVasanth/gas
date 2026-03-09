@@ -12,25 +12,88 @@ const FUEL_TYPES = [
 
 const COLORS = {
   "Gasolina IO95": {
-    border: "rgb(255, 99, 132)",
-    bg: "rgba(255, 99, 132, 0.1)",
+    border: "#0075eb",
+    bg: "rgba(0, 117, 235, 0.05)",
   },
   "Gasolina IO98": {
-    border: "rgb(75, 192, 192)",
-    bg: "rgba(75, 192, 192, 0.1)",
+    border: "#00b894",
+    bg: "rgba(0, 184, 148, 0.05)",
   },
   "Gasóleo Rodoviário": {
-    border: "rgb(54, 162, 235)",
-    bg: "rgba(54, 162, 235, 0.1)",
+    border: "#ff5252",
+    bg: "rgba(255, 82, 82, 0.05)",
   },
   "Gasóleo Colorido e Marcado": {
-    border: "rgb(255, 205, 86)",
-    bg: "rgba(255, 205, 86, 0.1)",
+    border: "#6c5ce7",
+    bg: "rgba(108, 92, 231, 0.05)",
   },
 };
 
 let chart = null;
+let currentTheme = 'system';
 
+// --- Theme Management ---
+function updateThemeIcon() {
+  const icon = document.getElementById("theme-icon");
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark" ||
+    (currentTheme === 'system' && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  if (isDark) {
+    icon.innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-11.314l.707.707m11.314 11.314l.707.707M12 5a7 7 0 0 0 0 14 7 7 0 0 0 0-14z"></path>';
+  } else {
+    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+  }
+
+  // Update meta theme-color
+  const metaThemeColor = document.getElementById('theme-color-meta');
+  if (metaThemeColor) {
+    const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim();
+    metaThemeColor.setAttribute('content', bg);
+  }
+}
+
+function setTheme(theme) {
+  currentTheme = theme;
+  if (theme === 'system') {
+    document.documentElement.removeAttribute("data-theme");
+    localStorage.removeItem("theme");
+  } else {
+    document.documentElement.setAttribute("data-theme", theme);
+    localStorage.setItem("theme", theme);
+  }
+  updateThemeIcon();
+}
+
+function toggleTheme() {
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark" ||
+    (currentTheme === 'system' && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  setTheme(isDark ? 'light' : 'dark');
+  if (chartData) renderChart(chartData);
+}
+
+// --- Share Management ---
+async function shareApp() {
+  const shareData = {
+    title: 'Preços de Combustíveis na Madeira',
+    text: 'Consulte os preços atuais dos combustíveis na Madeira e saiba se deve abastecer agora!',
+    url: window.location.href
+  };
+
+  try {
+    if (navigator.share) {
+      await navigator.share(shareData);
+    } else {
+      // Fallback: Copy to clipboard
+      await navigator.clipboard.writeText(window.location.href);
+      alert('Link copiado para a área de transferência!');
+    }
+  } catch (err) {
+    console.error('Error sharing:', err);
+  }
+}
+
+// --- Data Fetching & Display ---
 async function fetchData(url) {
   const response = await fetch(url);
   if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -39,11 +102,11 @@ async function fetchData(url) {
 
 function formatPriceDiff(current, previous) {
   const diff = current - previous;
-  const icon = diff > 0 ? "⬆️" : diff < 0 ? "⬇️" : "=";
+  const icon = diff > 0 ? "↗" : diff < 0 ? "↘" : "—";
   const colorClass =
     diff > 0 ? "price-up" : diff < 0 ? "price-down" : "price-equal";
   const diffText =
-    diff !== 0 ? ` (${diff > 0 ? "+" : ""}${diff.toFixed(3)}€)` : "";
+    diff !== 0 ? `${diff > 0 ? "+" : ""}${diff.toFixed(3)}€` : "Sem alteração";
 
   return {
     current: `${current.toFixed(3)}€`,
@@ -59,13 +122,15 @@ function displayCurrentPrices(data) {
   const currentGas = data.current.Gas;
   const previousGas = data.previous.Gas;
   const startDate = new Date(data.current["Start date"]).toLocaleDateString(
-    "pt-PT"
+    "pt-PT", { day: '2-digit', month: 'short' }
   );
-  const endDate = new Date(data.current["End date"]).toLocaleDateString("pt-PT");
+  const endDate = new Date(data.current["End date"]).toLocaleDateString(
+    "pt-PT", { day: '2-digit', month: 'short' }
+  );
 
   document.getElementById(
     "current-prices-heading"
-  ).textContent = `Preços Atuais (${startDate} - ${endDate})`;
+  ).textContent = `Preços Atuais • ${startDate} — ${endDate}`;
 
   let html = '<div class="price-cards">';
 
@@ -83,11 +148,11 @@ function displayCurrentPrices(data) {
     html += `
       <div class="price-card">
         <div class="fuel-type">${fuelType}</div>
-        <div class="price-value ${colorClass}">
+        <div class="price-value">
           <span class="main-price">${current}</span>
-          <span class="price-icon">${icon}</span>
+          <span class="price-icon ${colorClass}">${icon}</span>
         </div>
-        <div class="price-diff">${diffText}</div>
+        <div class="price-diff ${colorClass}">${diffText}</div>
       </div>
     `;
   }
@@ -116,7 +181,7 @@ function displayHistoricalTable(data) {
   for (const date of sortedDates.slice(0, 10)) {
     const priceData = data[date];
     html += `<tr><td>${new Date(priceData["Start date"]).toLocaleDateString(
-      "pt-PT"
+      "pt-PT", { day: '2-digit', month: 'short' }
     )}</td>`;
     for (const fuelType of FUEL_TYPES) {
       const price = priceData.Gas?.[fuelType] || priceData.Fuel?.[fuelType];
@@ -133,34 +198,46 @@ function renderChart(data) {
   const ctx = document.getElementById("priceHistoryChart").getContext("2d");
   const dates = Object.keys(data).sort((a, b) => new Date(a) - new Date(b));
 
-  const datasets = FUEL_TYPES.map((fuel) => ({
-    label: fuel,
-    data: dates.map(
-      (date) => data[date].Gas?.[fuel] || data[date].Fuel?.[fuel]
-    ),
-    borderColor: COLORS[fuel].border,
-    backgroundColor: COLORS[fuel].bg,
-    tension: 0.3,
-    fill: true,
-    pointRadius: 0,
-    pointHoverRadius: 6,
-    borderWidth: 2,
-  }));
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark" ||
+    (currentTheme === 'system' && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  const textColor = isDark ? "#9299a1" : "#636e72";
+  const gridColor = isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)";
+
+  const datasets = FUEL_TYPES.map((fuel) => {
+    const color = COLORS[fuel].border;
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, isDark ? `${color}33` : `${color}1A`);
+    gradient.addColorStop(1, 'transparent');
+
+    return {
+      label: fuel,
+      data: dates.map(
+        (date) => data[date].Gas?.[fuel] || data[date].Fuel?.[fuel]
+      ),
+      borderColor: color,
+      backgroundColor: gradient,
+      tension: 0.4,
+      fill: true,
+      pointRadius: 0,
+      pointHoverRadius: 6,
+      borderWidth: 2,
+    };
+  });
 
   if (chart) chart.destroy();
-
-  const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-  const textColor = isDark ? "#e0e0e0" : "#333";
-  const gridColor = isDark ? "rgba(255, 255, 255, 0.1)" : "rgba(0, 0, 0, 0.1)";
 
   chart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: dates.map((d) => new Date(d).toLocaleDateString("pt-PT")),
+      labels: dates.map((d) => new Date(d).toLocaleDateString("pt-PT", { day: '2-digit', month: 'short' })),
       datasets: datasets,
     },
     options: {
-      animation: false,
+      animation: {
+        duration: 1000,
+        easing: 'easeOutQuart'
+      },
       responsive: true,
       maintainAspectRatio: false,
       interaction: {
@@ -174,19 +251,12 @@ function renderChart(data) {
           },
           ticks: {
             color: textColor,
-            maxTicksLimit: 8,
+            maxTicksLimit: 6,
             maxRotation: 0,
+            font: { size: 11 }
           },
         },
         y: {
-          title: {
-            display: true,
-            text: "Preço (€/L)",
-            color: textColor,
-            font: {
-              weight: "bold",
-            },
-          },
           grid: {
             color: gridColor,
             drawBorder: false,
@@ -194,27 +264,30 @@ function renderChart(data) {
           ticks: {
             color: textColor,
             callback: (value) => value.toFixed(2) + "€",
+            font: { size: 11 }
           },
         },
       },
       plugins: {
         legend: {
           position: "top",
-          align: "end",
+          align: "start",
           labels: {
             color: textColor,
-            boxWidth: 12,
+            boxWidth: 8,
             usePointStyle: true,
             pointStyle: "circle",
             font: {
               size: 11,
+              weight: '600'
             },
+            padding: 15
           },
         },
         tooltip: {
-          backgroundColor: isDark ? "#2d2d2d" : "#fff",
-          titleColor: isDark ? "#fff" : "#2d3436",
-          bodyColor: isDark ? "#e0e0e0" : "#2d3436",
+          backgroundColor: isDark ? "#111" : "#fff",
+          titleColor: isDark ? "#fff" : "#191c1f",
+          bodyColor: isDark ? "#9299a1" : "#636e72",
           borderColor: gridColor,
           borderWidth: 1,
           padding: 12,
@@ -230,23 +303,38 @@ function renderChart(data) {
   });
 }
 
+let chartData = null;
+
 async function init() {
+  // Load saved theme
+  const savedTheme = localStorage.getItem("theme");
+  if (savedTheme) {
+    setTheme(savedTheme);
+  } else {
+    updateThemeIcon();
+  }
+
+  // Setup listeners
+  document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
+  document.getElementById("share-btn").addEventListener("click", shareApp);
+
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
+    if (currentTheme === 'system') {
+      updateThemeIcon();
+      if (chartData) renderChart(chartData);
+    }
+  });
+
   try {
     const [currentData, historicalData] = await Promise.all([
       fetchData(GAS_INFO_URL),
       fetchData(GAS_HISTORY_URL),
     ]);
 
+    chartData = historicalData;
     displayCurrentPrices(currentData);
     displayHistoricalTable(historicalData);
     renderChart(historicalData);
-
-    // Listen for color scheme changes to update chart
-    window
-      .matchMedia("(prefers-color-scheme: dark)")
-      .addEventListener("change", () => {
-        renderChart(historicalData);
-      });
   } catch (error) {
     console.error("Error loading data:", error);
     document.getElementById("app").innerHTML = `
