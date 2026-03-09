@@ -7,8 +7,12 @@ const FUEL_TYPES = [
   "Gasolina IO95",
   "Gasolina IO98",
   "Gasóleo Rodoviário",
-  "Gasóleo Colorido e Marcado",
+  "Gasóleo Colorido",
 ];
+
+const DATA_KEY_MAPPING = {
+  "Gasóleo Colorido": "Gasóleo Colorido e Marcado",
+};
 
 const COLORS = {
   "Gasolina IO95": {
@@ -23,13 +27,17 @@ const COLORS = {
     border: "#ff5252",
     bg: "rgba(255, 82, 82, 0.05)",
   },
-  "Gasóleo Colorido e Marcado": {
+  "Gasóleo Colorido": {
     border: "#6c5ce7",
     bg: "rgba(108, 92, 231, 0.05)",
   },
 };
 
+const DATE_OPTIONS = { day: '2-digit', month: '2-digit', year: 'numeric' };
+
 let chart = null;
+let currentPage = 1;
+const itemsPerPage = 10;
 let currentTheme = 'system';
 
 // --- Theme Management ---
@@ -122,10 +130,10 @@ function displayCurrentPrices(data) {
   const currentGas = data.current.Gas;
   const previousGas = data.previous.Gas;
   const startDate = new Date(data.current["Start date"]).toLocaleDateString(
-    "pt-PT", { day: '2-digit', month: 'short' }
+    "pt-PT", DATE_OPTIONS
   );
   const endDate = new Date(data.current["End date"]).toLocaleDateString(
-    "pt-PT", { day: '2-digit', month: 'short' }
+    "pt-PT", DATE_OPTIONS
   );
 
   document.getElementById(
@@ -134,12 +142,10 @@ function displayCurrentPrices(data) {
 
   let html = '<div class="price-cards">';
 
-  const sortedEntries = Object.entries(currentGas).sort((a, b) =>
-    a[0].localeCompare(b[0])
-  );
-
-  for (const [fuelType, price] of sortedEntries) {
-    const previousPrice = previousGas[fuelType];
+  for (const fuelType of FUEL_TYPES) {
+    const dataKey = DATA_KEY_MAPPING[fuelType] || fuelType;
+    const price = currentGas[dataKey];
+    const previousPrice = previousGas[dataKey];
     const { current, icon, diffText, colorClass } = formatPriceDiff(
       price,
       previousPrice
@@ -166,6 +172,11 @@ function displayHistoricalTable(data) {
     (a, b) => new Date(b) - new Date(a)
   );
 
+  const totalPages = Math.ceil(sortedDates.length / itemsPerPage);
+  const start = (currentPage - 1) * itemsPerPage;
+  const end = start + itemsPerPage;
+  const pagedDates = sortedDates.slice(start, end);
+
   let html = `
     <div class="table-container">
       <table>
@@ -178,20 +189,45 @@ function displayHistoricalTable(data) {
         <tbody>
   `;
 
-  for (const date of sortedDates.slice(0, 10)) {
+  for (const date of pagedDates) {
     const priceData = data[date];
     html += `<tr><td>${new Date(priceData["Start date"]).toLocaleDateString(
-      "pt-PT", { day: '2-digit', month: 'short' }
+      "pt-PT", DATE_OPTIONS
     )}</td>`;
     for (const fuelType of FUEL_TYPES) {
-      const price = priceData.Gas?.[fuelType] || priceData.Fuel?.[fuelType];
+      const dataKey = DATA_KEY_MAPPING[fuelType] || fuelType;
+      const price = priceData.Gas?.[dataKey] || priceData.Fuel?.[dataKey];
       html += `<td>${price ? price.toFixed(3) + "€" : "-"}</td>`;
     }
     html += "</tr>";
   }
 
   html += "</tbody></table></div>";
+
+  // Pagination controls
+  html += `
+    <div class="pagination">
+      <button class="pagination-btn" id="prev-page" ${currentPage === 1 ? 'disabled' : ''}>Anterior</button>
+      <span class="page-info">Página ${currentPage} de ${totalPages}</span>
+      <button class="pagination-btn" id="next-page" ${currentPage === totalPages ? 'disabled' : ''}>Próxima</button>
+    </div>
+  `;
+
   container.innerHTML = html;
+
+  document.getElementById('prev-page').onclick = () => {
+    if (currentPage > 1) {
+      currentPage--;
+      displayHistoricalTable(data);
+    }
+  };
+
+  document.getElementById('next-page').onclick = () => {
+    if (currentPage < totalPages) {
+      currentPage++;
+      displayHistoricalTable(data);
+    }
+  };
 }
 
 function renderChart(data) {
@@ -210,10 +246,11 @@ function renderChart(data) {
     gradient.addColorStop(0, isDark ? `${color}33` : `${color}1A`);
     gradient.addColorStop(1, 'transparent');
 
+    const dataKey = DATA_KEY_MAPPING[fuel] || fuel;
     return {
       label: fuel,
       data: dates.map(
-        (date) => data[date].Gas?.[fuel] || data[date].Fuel?.[fuel]
+        (date) => data[date].Gas?.[dataKey] || data[date].Fuel?.[dataKey]
       ),
       borderColor: color,
       backgroundColor: gradient,
@@ -230,7 +267,7 @@ function renderChart(data) {
   chart = new Chart(ctx, {
     type: "line",
     data: {
-      labels: dates.map((d) => new Date(d).toLocaleDateString("pt-PT", { day: '2-digit', month: 'short' })),
+      labels: dates.map((d) => new Date(d).toLocaleDateString("pt-PT", DATE_OPTIONS)),
       datasets: datasets,
     },
     options: {
@@ -351,6 +388,18 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("/sw.js")
+      .then((registration) => {
+        registration.addEventListener("updatefound", () => {
+          const newWorker = registration.installing;
+          newWorker.addEventListener("statechange", () => {
+            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+              // New content is available, show a subtle hint or auto-reload
+              // For a "functional" feel, we can reload to ensure the latest version
+              window.location.reload();
+            }
+          });
+        });
+      })
       .catch((err) => console.log("Service Worker registration failed:", err));
   });
 }
