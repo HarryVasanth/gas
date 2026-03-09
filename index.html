@@ -2,8 +2,9 @@
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <meta name="description" content="Consulte os preços atuais e o histórico de combustíveis na Região Autónoma da Madeira. Saiba se deve abastecer agora ou esperar." />
+    <meta name="theme-color" content="#ffffff" id="theme-color-meta">
     <title>Devo Abastecer - Preços de Combustíveis na Madeira</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="manifest" href="manifest.json" />
@@ -12,24 +13,43 @@
   </head>
 
   <body>
-    <main id="app">
-      <header>
+    <header class="app-header">
+      <div class="header-content">
         <h1>⛽️ Devo Abastecer</h1>
-      </header>
+        <div class="header-actions">
+          <button id="share-btn" class="icon-btn" aria-label="Partilhar">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+          </button>
+          <button id="theme-toggle" class="icon-btn" aria-label="Mudar tema">
+            <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+          </button>
+        </div>
+      </div>
+    </header>
 
-      <section aria-labelledby="current-prices-heading">
-        <h2 id="current-prices-heading">Preços Atuais</h2>
+    <main id="app">
+      <section id="current-section" aria-labelledby="current-prices-heading">
+        <header class="section-header">
+          <h2 id="current-prices-heading">Preços Atuais</h2>
+        </header>
         <div id="current-prices"></div>
       </section>
 
-      <section aria-labelledby="history-heading">
-        <h2 id="history-heading">Histórico de Preços</h2>
+      <section id="history-section" aria-labelledby="history-heading">
+        <header class="section-header">
+          <h2 id="history-heading">Histórico de Preços</h2>
+        </header>
         <div id="history-chart-container" role="region" aria-label="Gráfico de histórico de preços">
           <canvas id="priceHistoryChart"></canvas>
         </div>
         <div id="historical-prices"></div>
       </section>
     </main>
+
+    <footer class="app-footer">
+      <p>Dados atualizados semanalmente • <a href="https://github.com/carlosrsabreu/devo-abastecer" target="_blank" rel="noopener">GitHub</a></p>
+    </footer>
+
     <script src="app.js"></script>
   </body>
 </html>
