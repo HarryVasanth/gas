@@ -113,6 +113,11 @@ h1 {
   background-color: var(--border-color);
 }
 
+#lang-icon {
+  font-weight: 700;
+  font-size: 0.8rem;
+}
+
 /* Main Content */
 main {
   max-width: 900px;
@@ -123,6 +128,9 @@ main {
 .section-header {
   margin-top: 24px;
   margin-bottom: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 h2 {

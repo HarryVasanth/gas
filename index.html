@@ -16,7 +16,9 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="manifest" href="manifest.json" />
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
-    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial/dist/chartjs-chart-financial.min.js"></script>
   </head>
 
   <body>
@@ -24,6 +26,12 @@
       <div class="header-content">
         <h1>⛽️ Devo Abastecer</h1>
         <div class="header-actions">
+          <button id="lang-toggle" class="icon-btn" aria-label="Mudar idioma">
+            <span id="lang-icon">EN</span>
+          </button>
+          <button id="install-btn" class="icon-btn" aria-label="Instalar App" style="display: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          </button>
           <button id="share-btn" class="icon-btn" aria-label="Partilhar">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
           </button>
@@ -45,6 +53,11 @@
       <section id="history-section" aria-labelledby="history-heading">
         <header class="section-header">
           <h2 id="history-heading">Histórico de Preços</h2>
+          <div class="header-actions">
+            <button id="chart-style-toggle" class="icon-btn" aria-label="Mudar estilo do gráfico">
+              <svg id="chart-style-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            </button>
+          </div>
         </header>
         <div id="history-chart-container" role="region" aria-label="Gráfico de histórico de preços">
           <canvas id="priceHistoryChart"></canvas>
