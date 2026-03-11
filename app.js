@@ -36,33 +36,6 @@ const COLORS = {
 const DATE_OPTIONS = { day: '2-digit', month: '2-digit', year: 'numeric' };
 
 const TRANSLATIONS = {
-  pt: {
-    title: "Devo Abastecer - Preços de Combustíveis na Madeira",
-    headerTitle: "⛽️ Devo Abastecer",
-    currentPrices: "Preços Atuais",
-    historyPrices: "Histórico de Preços",
-    date: "Data",
-    previous: "Anterior",
-    next: "Próxima",
-    page: "Página {current} de {total}",
-    noChange: "Sem alteração",
-    shareTitle: "Preços de Combustíveis na Madeira",
-    shareText: "Consulte os preços atuais dos combustíveis na Madeira e saiba se deve abastecer agora!",
-    shareError: "Erro ao partilhar:",
-    copySuccess: "Link copiado para a área de transferência!",
-    errorLoading: "Erro ao carregar dados. Por favor, tente novamente mais tarde.",
-    fuelTypes: {
-      "Gasolina IO95": "Gasolina IO95",
-      "Gasolina IO98": "Gasolina IO98",
-      "Gasóleo Rodoviário": "Gasóleo Rodoviário",
-      "Gasóleo Colorido": "Gasóleo Colorido",
-    },
-    installApp: "Instalar App",
-    changeTheme: "Mudar tema",
-    changeLang: "Mudar idioma",
-    changeChartStyle: "Mudar estilo do gráfico",
-    footerText: "Dados atualizados semanalmente"
-  },
   en: {
     title: "Should I Refuel - Fuel Prices in Madeira",
     headerTitle: "⛽️ Should I Refuel",
@@ -88,7 +61,48 @@ const TRANSLATIONS = {
     changeTheme: "Change theme",
     changeLang: "Change language",
     changeChartStyle: "Change chart style",
-    footerText: "Data updated weekly"
+    resetZoom: "Reset zoom",
+    fullscreen: "Fullscreen",
+    exitFullscreen: "Exit fullscreen",
+    footerText: "Data updated weekly",
+    open: "Open",
+    high: "High",
+    low: "Low",
+    close: "Close"
+  },
+  pt: {
+    title: "Devo Abastecer - Preços de Combustíveis na Madeira",
+    headerTitle: "⛽️ Devo Abastecer",
+    currentPrices: "Preços Atuais",
+    historyPrices: "Histórico de Preços",
+    date: "Data",
+    previous: "Anterior",
+    next: "Próxima",
+    page: "Página {current} de {total}",
+    noChange: "Sem alteração",
+    shareTitle: "Preços de Combustíveis na Madeira",
+    shareText: "Consulte os preços atuais dos combustíveis na Madeira e saiba se deve abastecer agora!",
+    shareError: "Erro ao partilhar:",
+    copySuccess: "Link copiado para a área de transferência!",
+    errorLoading: "Erro ao carregar dados. Por favor, tente novamente mais tarde.",
+    fuelTypes: {
+      "Gasolina IO95": "Gasolina IO95",
+      "Gasolina IO98": "Gasolina IO98",
+      "Gasóleo Rodoviário": "Gasóleo Rodoviário",
+      "Gasóleo Colorido": "Gasóleo Colorido",
+    },
+    installApp: "Instalar App",
+    changeTheme: "Mudar tema",
+    changeLang: "Mudar idioma",
+    changeChartStyle: "Mudar estilo do gráfico",
+    resetZoom: "Repor zoom",
+    fullscreen: "Ecrã inteiro",
+    exitFullscreen: "Sair de ecrã inteiro",
+    footerText: "Dados atualizados semanalmente",
+    open: "Abertura",
+    high: "Máximo",
+    low: "Mínimo",
+    close: "Fecho"
   }
 };
 
@@ -117,6 +131,12 @@ function setLanguage(lang) {
   document.getElementById("theme-toggle").setAttribute("aria-label", TRANSLATIONS[lang].changeTheme);
   document.getElementById("lang-toggle").setAttribute("aria-label", TRANSLATIONS[lang].changeLang);
   document.getElementById("chart-style-toggle").setAttribute("aria-label", TRANSLATIONS[lang].changeChartStyle);
+  document.getElementById("chart-reset-zoom").setAttribute("aria-label", TRANSLATIONS[lang].resetZoom);
+  document.getElementById("chart-fullscreen").setAttribute("aria-label",
+    document.getElementById("history-chart-container").classList.contains("fullscreen")
+      ? TRANSLATIONS[lang].exitFullscreen
+      : TRANSLATIONS[lang].fullscreen
+  );
   document.getElementById("install-btn").setAttribute("aria-label", TRANSLATIONS[lang].installApp);
   document.querySelector(".app-footer p").childNodes[0].textContent = TRANSLATIONS[lang].footerText + " • ";
 
@@ -151,6 +171,32 @@ function toggleChartStyle() {
   localStorage.setItem("chartStyle", chartStyle);
   updateChartStyleIcon();
   if (chartData) renderChart(chartData);
+}
+
+function resetChartZoom() {
+  if (chart) chart.resetZoom();
+}
+
+function toggleChartFullscreen() {
+  const container = document.getElementById("history-chart-container");
+  const section = document.getElementById("history-section");
+  const icon = document.getElementById("fullscreen-icon");
+  const isFullscreen = container.classList.toggle("fullscreen");
+  section.classList.toggle("is-fullscreen", isFullscreen);
+
+  if (isFullscreen) {
+    icon.innerHTML = '<path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M3 3l7 7m0 0V4m0 6H4m17-7l-7 7m0 0V4m0 6h6"></path>';
+  } else {
+    icon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>';
+  }
+
+  document.getElementById("chart-fullscreen").setAttribute("aria-label",
+    isFullscreen ? TRANSLATIONS[currentLang].exitFullscreen : TRANSLATIONS[currentLang].fullscreen
+  );
+
+  if (chart) {
+    chart.resize();
+  }
 }
 
 // --- Theme Management ---
@@ -473,6 +519,21 @@ function renderChart(data) {
         },
       },
       plugins: {
+        zoom: {
+          pan: {
+            enabled: true,
+            mode: 'x',
+          },
+          zoom: {
+            wheel: {
+              enabled: true,
+            },
+            pinch: {
+              enabled: true
+            },
+            mode: 'x',
+          }
+        },
         legend: {
           position: "top",
           align: "start",
@@ -498,8 +559,21 @@ function renderChart(data) {
           boxPadding: 6,
           usePointStyle: true,
           callbacks: {
-            label: (context) =>
-              ` ${context.dataset.label}: ${context.parsed.y.toFixed(3)}€`,
+            label: (context) => {
+              if (chartStyle === 'line') {
+                return ` ${context.dataset.label}: ${context.parsed.y.toFixed(3)}€`;
+              } else {
+                const p = context.raw;
+                const t = TRANSLATIONS[currentLang];
+                return [
+                  ` ${context.dataset.label}`,
+                  `  ${t.open}: ${p.o.toFixed(3)}€`,
+                  `  ${t.high}: ${p.h.toFixed(3)}€`,
+                  `  ${t.low}: ${p.l.toFixed(3)}€`,
+                  `  ${t.close}: ${p.c.toFixed(3)}€`
+                ];
+              }
+            }
           },
         },
       },
@@ -520,11 +594,9 @@ async function init() {
     updateThemeIcon();
   }
 
-  // Load saved language
-  const savedLang = localStorage.getItem("lang");
-  if (savedLang) {
-    setLanguage(savedLang);
-  }
+  // Load saved language or default to pt
+  const savedLang = localStorage.getItem("lang") || 'pt';
+  setLanguage(savedLang);
 
   // Load saved chart style
   const savedChartStyle = localStorage.getItem("chartStyle");
@@ -533,11 +605,19 @@ async function init() {
     updateChartStyleIcon();
   }
 
+  // Initialize from system preference if no saved theme
+  if (!savedTheme) {
+    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
+  }
+
   // Setup listeners
   document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
   document.getElementById("share-btn").addEventListener("click", shareApp);
   document.getElementById("lang-toggle").addEventListener("click", toggleLanguage);
   document.getElementById("chart-style-toggle").addEventListener("click", toggleChartStyle);
+  document.getElementById("chart-reset-zoom").addEventListener("click", resetChartZoom);
+  document.getElementById("chart-fullscreen").addEventListener("click", toggleChartFullscreen);
 
   window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
     if (currentTheme === 'system') {
@@ -596,7 +676,13 @@ window.addEventListener('beforeinstallprompt', (e) => {
   e.preventDefault();
   deferredPrompt = e;
   const installBtn = document.getElementById('install-btn');
-  if (installBtn) installBtn.style.display = 'flex';
+  if (installBtn) {
+    installBtn.style.display = 'flex';
+    // Add a subtle pulse animation if it's mobile
+    if (window.innerWidth <= 600) {
+      installBtn.style.animation = 'pulse 2s infinite';
+    }
+  }
 });
 
 document.getElementById('install-btn').addEventListener('click', async () => {
