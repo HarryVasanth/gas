@@ -65,10 +65,14 @@ const TRANSLATIONS = {
     fullscreen: "Fullscreen",
     exitFullscreen: "Exit fullscreen",
     footerText: "Data updated weekly",
-    open: "Open",
-    high: "High",
-    low: "Low",
-    close: "Close"
+    pastWeek: "Past Week",
+    currentWeek: "Current Week",
+    chartStyles: {
+      line: "Line Chart",
+      bar: "Bar Chart",
+      step: "Step Chart",
+      candlestick: "Candlestick Chart"
+    }
   },
   pt: {
     title: "Devo Abastecer - Preços de Combustíveis na Madeira",
@@ -99,10 +103,14 @@ const TRANSLATIONS = {
     fullscreen: "Ecrã inteiro",
     exitFullscreen: "Sair de ecrã inteiro",
     footerText: "Dados atualizados semanalmente",
-    open: "Abertura",
-    high: "Máximo",
-    low: "Mínimo",
-    close: "Fecho"
+    pastWeek: "Semana Anterior",
+    currentWeek: "Semana Atual",
+    chartStyles: {
+      line: "Gráfico de Linha",
+      bar: "Gráfico de Barras",
+      step: "Gráfico de Escada",
+      candlestick: "Gráfico de Velas"
+    }
   }
 };
 
@@ -130,7 +138,6 @@ function setLanguage(lang) {
   document.getElementById("share-btn").setAttribute("aria-label", TRANSLATIONS[lang].shareTitle);
   document.getElementById("theme-toggle").setAttribute("aria-label", TRANSLATIONS[lang].changeTheme);
   document.getElementById("lang-toggle").setAttribute("aria-label", TRANSLATIONS[lang].changeLang);
-  document.getElementById("chart-style-toggle").setAttribute("aria-label", TRANSLATIONS[lang].changeChartStyle);
   document.getElementById("chart-reset-zoom").setAttribute("aria-label", TRANSLATIONS[lang].resetZoom);
   document.getElementById("chart-fullscreen").setAttribute("aria-label",
     document.getElementById("history-chart-container").classList.contains("fullscreen")
@@ -138,9 +145,14 @@ function setLanguage(lang) {
       : TRANSLATIONS[lang].fullscreen
   );
   document.getElementById("install-btn").setAttribute("aria-label", TRANSLATIONS[lang].installApp);
-  document.querySelector(".app-footer p").childNodes[0].textContent = TRANSLATIONS[lang].footerText + " • ";
+
+  const footerText = document.getElementById("footer-update-text");
+  if (footerText) {
+    footerText.textContent = TRANSLATIONS[lang].footerText + " • ";
+  }
 
   document.getElementById("lang-icon").textContent = lang === 'pt' ? 'EN' : 'PT';
+  document.getElementById("live-badge").textContent = lang === 'pt' ? 'DIRETO' : 'LIVE';
 
   // Refresh dynamic content
   if (cachedCurrentData) displayCurrentPrices(cachedCurrentData);
@@ -157,17 +169,24 @@ function toggleLanguage() {
 // --- Chart Style Management ---
 function updateChartStyleIcon() {
   const icon = document.getElementById("chart-style-icon");
-  if (chartStyle === 'line') {
-    // Line icon
-    icon.innerHTML = '<line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line>';
-  } else {
-    // Candlestick icon
-    icon.innerHTML = '<path d="M3 3v18h18"></path><path d="M7 12V8"></path><path d="M7 16v-2"></path><path d="M11 15V9"></path><path d="M11 19v-2"></path><path d="M15 13V7"></path><path d="M15 17v-2"></path><path d="M19 11V5"></path><path d="M19 15v-2"></path>';
-  }
+  const lang = currentLang;
+
+  const styles = {
+    line: '<path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path>',
+    bar: '<path d="M3 3v18h18"></path><rect width="4" height="7" x="7" y="10" rx="1"></rect><rect width="4" height="12" x="15" y="5" rx="1"></rect>',
+    step: '<path d="M3 3v18h18"></path><path d="M7 15h4V10h4V5h4"></path>',
+    candlestick: '<path d="M3 3v18h18"></path><rect width="4" height="8" x="7" y="9" rx="1"></rect><path d="M9 17v2"></path><path d="M9 7v2"></path><rect width="4" height="12" x="15" y="5" rx="1"></rect><path d="M17 17v2"></path><path d="M17 3v2"></path>'
+  };
+
+  icon.innerHTML = styles[chartStyle] || styles.line;
+  document.getElementById("chart-style-toggle").setAttribute("aria-label", TRANSLATIONS[lang].chartStyles[chartStyle]);
 }
 
 function toggleChartStyle() {
-  chartStyle = chartStyle === 'line' ? 'candlestick' : 'line';
+  const styles = ['line', 'bar', 'step', 'candlestick'];
+  const currentIndex = styles.indexOf(chartStyle);
+  chartStyle = styles[(currentIndex + 1) % styles.length];
+
   localStorage.setItem("chartStyle", chartStyle);
   updateChartStyleIcon();
   if (chartData) renderChart(chartData);
@@ -417,30 +436,10 @@ function renderChart(data) {
   const locale = currentLang === 'pt' ? 'pt-PT' : 'en-GB';
 
   let datasets;
-  if (chartStyle === 'line') {
-    datasets = FUEL_TYPES.map((fuel) => {
-      const color = COLORS[fuel].border;
-      const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-      gradient.addColorStop(0, isDark ? `${color}33` : `${color}1A`);
-      gradient.addColorStop(1, 'transparent');
+  let chartType = 'line';
 
-      const dataKey = DATA_KEY_MAPPING[fuel] || fuel;
-      return {
-        label: TRANSLATIONS[currentLang].fuelTypes[fuel],
-        data: dates.map(
-          (date) => data[date].Gas?.[dataKey] || data[date].Fuel?.[dataKey]
-        ),
-        borderColor: color,
-        backgroundColor: gradient,
-        tension: 0.4,
-        fill: true,
-        pointRadius: 0,
-        pointHoverRadius: 6,
-        borderWidth: 2,
-      };
-    });
-  } else {
-    // Candlestick style
+  if (chartStyle === 'candlestick') {
+    chartType = 'candlestick';
     datasets = FUEL_TYPES.map((fuel) => {
       const color = COLORS[fuel].border;
       const dataKey = DATA_KEY_MAPPING[fuel] || fuel;
@@ -469,14 +468,45 @@ function renderChart(data) {
         borderColor: color,
       };
     });
+  } else {
+    chartType = chartStyle === 'bar' ? 'bar' : 'line';
+    datasets = FUEL_TYPES.map((fuel) => {
+      const color = COLORS[fuel].border;
+      const dataKey = DATA_KEY_MAPPING[fuel] || fuel;
+      const fuelData = dates.map(
+        (date) => data[date].Gas?.[dataKey] || data[date].Fuel?.[dataKey]
+      );
+
+      const config = {
+        label: TRANSLATIONS[currentLang].fuelTypes[fuel],
+        data: fuelData,
+        borderColor: color,
+        backgroundColor: chartStyle === 'bar' ? `${color}80` : 'transparent',
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 6,
+      };
+
+      if (chartStyle === 'line' || chartStyle === 'step') {
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, isDark ? `${color}33` : `${color}1A`);
+        gradient.addColorStop(1, 'transparent');
+        config.backgroundColor = gradient;
+        config.fill = true;
+        config.tension = chartStyle === 'step' ? 0 : 0.4;
+        config.stepped = chartStyle === 'step';
+      }
+
+      return config;
+    });
   }
 
   if (chart) chart.destroy();
 
   const chartConfig = {
-    type: chartStyle === 'line' ? 'line' : 'candlestick',
+    type: chartType,
     data: {
-      labels: chartStyle === 'line' ? dates.map((d) => new Date(d).toLocaleDateString(locale, DATE_OPTIONS)) : [],
+      labels: chartType === 'line' || chartType === 'bar' || chartType === 'step' ? dates.map((d) => new Date(d).toLocaleDateString(locale, DATE_OPTIONS)) : [],
       datasets: datasets,
     },
     options: {
@@ -487,12 +517,12 @@ function renderChart(data) {
       responsive: true,
       maintainAspectRatio: false,
       interaction: {
-        mode: chartStyle === 'line' ? "index" : "nearest",
+        mode: chartStyle === 'candlestick' ? "nearest" : "index",
         intersect: false,
       },
       scales: {
         x: {
-          type: chartStyle === 'line' ? 'category' : 'time',
+          type: chartStyle === 'candlestick' ? 'time' : 'category',
           grid: {
             display: false,
           },
@@ -560,18 +590,16 @@ function renderChart(data) {
           usePointStyle: true,
           callbacks: {
             label: (context) => {
-              if (chartStyle === 'line') {
-                return ` ${context.dataset.label}: ${context.parsed.y.toFixed(3)}€`;
-              } else {
+              const t = TRANSLATIONS[currentLang];
+              if (chartStyle === 'candlestick') {
                 const p = context.raw;
-                const t = TRANSLATIONS[currentLang];
                 return [
                   ` ${context.dataset.label}`,
-                  `  ${t.open}: ${p.o.toFixed(3)}€`,
-                  `  ${t.high}: ${p.h.toFixed(3)}€`,
-                  `  ${t.low}: ${p.l.toFixed(3)}€`,
-                  `  ${t.close}: ${p.c.toFixed(3)}€`
+                  `  ${t.pastWeek}: ${p.o.toFixed(3)}€`,
+                  `  ${t.currentWeek}: ${p.c.toFixed(3)}€`
                 ];
+              } else {
+                return ` ${context.dataset.label}: ${context.parsed.y.toFixed(3)}€`;
               }
             }
           },
@@ -586,13 +614,9 @@ function renderChart(data) {
 let chartData = null;
 
 async function init() {
-  // Load saved theme
-  const savedTheme = localStorage.getItem("theme");
-  if (savedTheme) {
-    setTheme(savedTheme);
-  } else {
-    updateThemeIcon();
-  }
+  // Load saved theme or default to system
+  const savedTheme = localStorage.getItem("theme") || 'system';
+  setTheme(savedTheme);
 
   // Load saved language or default to pt
   const savedLang = localStorage.getItem("lang") || 'pt';
@@ -603,12 +627,6 @@ async function init() {
   if (savedChartStyle) {
     chartStyle = savedChartStyle;
     updateChartStyleIcon();
-  }
-
-  // Initialize from system preference if no saved theme
-  if (!savedTheme) {
-    const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.setAttribute("data-theme", isDark ? "dark" : "light");
   }
 
   // Setup listeners
