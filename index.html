@@ -12,6 +12,13 @@
     <meta name="apple-mobile-web-app-title" content="Devo Abastecer">
     <link rel="apple-touch-icon" href="icon.png">
 
+    <!-- OpenGraph tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Devo Abastecer - Preços de Combustíveis na Madeira">
+    <meta property="og:description" content="Consulte os preços atuais e o histórico de combustíveis na Região Autónoma da Madeira. Saiba se deve abastecer agora ou esperar.">
+    <meta property="og:image" content="icon.png">
+    <meta property="og:url" content="https://devoabastecer.com">
+
     <title>Devo Abastecer - Preços de Combustíveis na Madeira</title>
     <link rel="stylesheet" href="styles.css" />
     <link rel="manifest" href="manifest.json" />
@@ -46,7 +53,10 @@
     <main id="app">
       <section id="current-section" aria-labelledby="current-prices-heading">
         <header class="section-header">
-          <h2 id="current-prices-heading">Preços Atuais</h2>
+          <div class="title-with-badge">
+            <h2 id="current-prices-heading">Preços Atuais</h2>
+            <span class="live-badge" id="live-badge">LIVE</span>
+          </div>
         </header>
         <div id="current-prices"></div>
       </section>
@@ -74,7 +84,7 @@
     </main>
 
     <footer class="app-footer">
-      <p>Dados atualizados semanalmente • <a href="https://github.com/carlosrsabreu/devo-abastecer" target="_blank" rel="noopener">GitHub</a></p>
+      <p><span id="footer-update-text">Dados atualizados semanalmente • </span><a href="https://github.com/carlosrsabreu/devo-abastecer" target="_blank" rel="noopener">GitHub</a></p>
     </footer>
 
     <script src="app.js"></script>
