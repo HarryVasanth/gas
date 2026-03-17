@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
@@ -13,7 +13,7 @@
     <script>
       async function loadData() {
         const response = await fetch(
-          "https://raw.githubusercontent.com/carlosrsabreu/devo-abastecer/main/history/gas_info_history.json"
+          "https://raw.githubusercontent.com/carlosrsabreu/devo-abastecer/main/history/gas_info_history.json",
         );
         const data = await response.json();
 
@@ -39,7 +39,7 @@
           datasets.push({
             label: fuel,
             data: dates.map(
-              (date) => data[date].Gas?.[fuel] || data[date].Fuel?.[fuel]
+              (date) => data[date].Gas?.[fuel] || data[date].Fuel?.[fuel],
             ),
             borderColor: colors[fuel],
             tension: 0.1,

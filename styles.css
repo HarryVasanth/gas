@@ -54,13 +54,17 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
   margin: 0;
   padding: 0;
   background-color: var(--bg-color);
   color: var(--text-color);
   line-height: 1.5;
-  transition: background-color var(--transition-speed), color var(--transition-speed);
+  transition:
+    background-color var(--transition-speed),
+    color var(--transition-speed);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -102,9 +106,15 @@ body {
 }
 
 @keyframes breathe {
-  0% { opacity: 0.6; }
-  50% { opacity: 1; }
-  100% { opacity: 0.6; }
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
 }
 
 h1 {
@@ -227,9 +237,15 @@ h2 {
   font-weight: 600;
 }
 
-.price-up { color: var(--up-color); }
-.price-down { color: var(--down-color); }
-.price-equal { color: var(--equal-color); }
+.price-up {
+  color: var(--up-color);
+}
+.price-down {
+  color: var(--down-color);
+}
+.price-equal {
+  color: var(--equal-color);
+}
 
 /* Chart */
 #history-chart-container {
@@ -324,7 +340,8 @@ table {
   border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
   padding: 16px;
   text-align: left;
   border-bottom: 1px solid var(--border-color);
@@ -358,17 +375,31 @@ tr:last-child td {
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
-.price-card, #history-chart-container, .table-container {
+.price-card,
+#history-chart-container,
+.table-container {
   animation: fadeIn 0.5s ease-out forwards;
 }
 
@@ -403,7 +434,8 @@ tr:last-child td {
     padding: 12px;
   }
 
-  th, td {
+  th,
+  td {
     padding: 12px;
     font-size: 0.85rem;
   }

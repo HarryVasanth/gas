@@ -4,7 +4,7 @@ const urlsToCache = ["/", "/index.html", "/styles.css", "/app.js"];
 self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache)),
   );
 });
 
@@ -16,9 +16,9 @@ self.addEventListener("activate", (event) => {
           if (cacheName !== CACHE_NAME) {
             return caches.delete(cacheName);
           }
-        })
+        }),
       );
-    })
+    }),
   );
 });
 
@@ -34,7 +34,7 @@ self.addEventListener("fetch", (event) => {
           });
           return response;
         })
-        .catch(() => caches.match(event.request))
+        .catch(() => caches.match(event.request)),
     );
     return;
   }
@@ -49,6 +49,6 @@ self.addEventListener("fetch", (event) => {
         return networkResponse;
       });
       return response || fetchPromise;
-    })
+    }),
   );
 });
