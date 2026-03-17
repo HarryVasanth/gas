@@ -33,7 +33,7 @@ const COLORS = {
   },
 };
 
-const DATE_OPTIONS = { day: '2-digit', month: '2-digit', year: 'numeric' };
+const DATE_OPTIONS = { day: "2-digit", month: "2-digit", year: "numeric" };
 
 const TRANSLATIONS = {
   en: {
@@ -47,7 +47,8 @@ const TRANSLATIONS = {
     page: "Page {current} of {total}",
     noChange: "No change",
     shareTitle: "Fuel Prices in Madeira",
-    shareText: "Check current fuel prices in Madeira and know if you should refuel now!",
+    shareText:
+      "Check current fuel prices in Madeira and know if you should refuel now!",
     shareError: "Error sharing:",
     copySuccess: "Link copied to clipboard!",
     errorLoading: "Error loading data. Please try again later.",
@@ -71,8 +72,8 @@ const TRANSLATIONS = {
       line: "Line Chart",
       bar: "Bar Chart",
       step: "Step Chart",
-      candlestick: "Candlestick Chart"
-    }
+      candlestick: "Candlestick Chart",
+    },
   },
   pt: {
     title: "Devo Abastecer - Preços de Combustíveis na Madeira",
@@ -85,10 +86,12 @@ const TRANSLATIONS = {
     page: "Página {current} de {total}",
     noChange: "Sem alteração",
     shareTitle: "Preços de Combustíveis na Madeira",
-    shareText: "Consulte os preços atuais dos combustíveis na Madeira e saiba se deve abastecer agora!",
+    shareText:
+      "Consulte os preços atuais dos combustíveis na Madeira e saiba se deve abastecer agora!",
     shareError: "Erro ao partilhar:",
     copySuccess: "Link copiado para a área de transferência!",
-    errorLoading: "Erro ao carregar dados. Por favor, tente novamente mais tarde.",
+    errorLoading:
+      "Erro ao carregar dados. Por favor, tente novamente mais tarde.",
     fuelTypes: {
       "Gasolina IO95": "Gasolina IO95",
       "Gasolina IO98": "Gasolina IO98",
@@ -109,17 +112,17 @@ const TRANSLATIONS = {
       line: "Gráfico de Linha",
       bar: "Gráfico de Barras",
       step: "Gráfico de Escada",
-      candlestick: "Gráfico de Velas"
-    }
-  }
+      candlestick: "Gráfico de Velas",
+    },
+  },
 };
 
 let chart = null;
 let currentPage = 1;
 const itemsPerPage = 10;
-let currentTheme = 'system';
-let currentLang = 'pt';
-let chartStyle = 'line';
+let currentTheme = "system";
+let currentLang = "pt";
+let chartStyle = "line";
 let cachedCurrentData = null;
 
 // --- Language Management ---
@@ -130,29 +133,49 @@ function setLanguage(lang) {
 
   // Update static text
   document.title = TRANSLATIONS[lang].title;
-  document.querySelector(".app-header h1").textContent = TRANSLATIONS[lang].headerTitle;
-  document.getElementById("current-prices-heading").textContent = TRANSLATIONS[lang].currentPrices;
-  document.getElementById("history-heading").textContent = TRANSLATIONS[lang].historyPrices;
+  document.querySelector(".app-header h1").textContent =
+    TRANSLATIONS[lang].headerTitle;
+  document.getElementById("current-prices-heading").textContent =
+    TRANSLATIONS[lang].currentPrices;
+  document.getElementById("history-heading").textContent =
+    TRANSLATIONS[lang].historyPrices;
 
   // Update aria-labels
-  document.getElementById("share-btn").setAttribute("aria-label", TRANSLATIONS[lang].shareTitle);
-  document.getElementById("theme-toggle").setAttribute("aria-label", TRANSLATIONS[lang].changeTheme);
-  document.getElementById("lang-toggle").setAttribute("aria-label", TRANSLATIONS[lang].changeLang);
-  document.getElementById("chart-reset-zoom").setAttribute("aria-label", TRANSLATIONS[lang].resetZoom);
-  document.getElementById("chart-fullscreen").setAttribute("aria-label",
-    document.getElementById("history-chart-container").classList.contains("fullscreen")
-      ? TRANSLATIONS[lang].exitFullscreen
-      : TRANSLATIONS[lang].fullscreen
-  );
-  document.getElementById("install-btn").setAttribute("aria-label", TRANSLATIONS[lang].installApp);
+  document
+    .getElementById("share-btn")
+    .setAttribute("aria-label", TRANSLATIONS[lang].shareTitle);
+  document
+    .getElementById("theme-toggle")
+    .setAttribute("aria-label", TRANSLATIONS[lang].changeTheme);
+  document
+    .getElementById("lang-toggle")
+    .setAttribute("aria-label", TRANSLATIONS[lang].changeLang);
+  document
+    .getElementById("chart-reset-zoom")
+    .setAttribute("aria-label", TRANSLATIONS[lang].resetZoom);
+  document
+    .getElementById("chart-fullscreen")
+    .setAttribute(
+      "aria-label",
+      document
+        .getElementById("history-chart-container")
+        .classList.contains("fullscreen")
+        ? TRANSLATIONS[lang].exitFullscreen
+        : TRANSLATIONS[lang].fullscreen,
+    );
+  document
+    .getElementById("install-btn")
+    .setAttribute("aria-label", TRANSLATIONS[lang].installApp);
 
   const footerText = document.getElementById("footer-update-text");
   if (footerText) {
     footerText.textContent = TRANSLATIONS[lang].footerText + " • ";
   }
 
-  document.getElementById("lang-icon").textContent = lang === 'pt' ? 'EN' : 'PT';
-  document.getElementById("live-badge").textContent = lang === 'pt' ? 'DIRETO' : 'LIVE';
+  document.getElementById("lang-icon").textContent =
+    lang === "pt" ? "EN" : "PT";
+  document.getElementById("live-badge").textContent =
+    lang === "pt" ? "DIRETO" : "LIVE";
 
   // Refresh dynamic content
   if (cachedCurrentData) displayCurrentPrices(cachedCurrentData);
@@ -163,7 +186,7 @@ function setLanguage(lang) {
 }
 
 function toggleLanguage() {
-  setLanguage(currentLang === 'pt' ? 'en' : 'pt');
+  setLanguage(currentLang === "pt" ? "en" : "pt");
 }
 
 // --- Chart Style Management ---
@@ -175,15 +198,18 @@ function updateChartStyleIcon() {
     line: '<path d="M3 3v18h18"></path><path d="m19 9-5 5-4-4-3 3"></path>',
     bar: '<path d="M3 3v18h18"></path><rect width="4" height="7" x="7" y="10" rx="1"></rect><rect width="4" height="12" x="15" y="5" rx="1"></rect>',
     step: '<path d="M3 3v18h18"></path><path d="M7 15h4V10h4V5h4"></path>',
-    candlestick: '<path d="M3 3v18h18"></path><rect width="4" height="8" x="7" y="9" rx="1"></rect><path d="M9 17v2"></path><path d="M9 7v2"></path><rect width="4" height="12" x="15" y="5" rx="1"></rect><path d="M17 17v2"></path><path d="M17 3v2"></path>'
+    candlestick:
+      '<path d="M3 3v18h18"></path><rect width="4" height="8" x="7" y="9" rx="1"></rect><path d="M9 17v2"></path><path d="M9 7v2"></path><rect width="4" height="12" x="15" y="5" rx="1"></rect><path d="M17 17v2"></path><path d="M17 3v2"></path>',
   };
 
   icon.innerHTML = styles[chartStyle] || styles.line;
-  document.getElementById("chart-style-toggle").setAttribute("aria-label", TRANSLATIONS[lang].chartStyles[chartStyle]);
+  document
+    .getElementById("chart-style-toggle")
+    .setAttribute("aria-label", TRANSLATIONS[lang].chartStyles[chartStyle]);
 }
 
 function toggleChartStyle() {
-  const styles = ['line', 'bar', 'step', 'candlestick'];
+  const styles = ["line", "bar", "step", "candlestick"];
   const currentIndex = styles.indexOf(chartStyle);
   chartStyle = styles[(currentIndex + 1) % styles.length];
 
@@ -204,14 +230,21 @@ function toggleChartFullscreen() {
   section.classList.toggle("is-fullscreen", isFullscreen);
 
   if (isFullscreen) {
-    icon.innerHTML = '<path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M3 3l7 7m0 0V4m0 6H4m17-7l-7 7m0 0V4m0 6h6"></path>';
+    icon.innerHTML =
+      '<path d="M4 14h6m0 0v6m0-6L3 21m17-7h-6m0 0v6m0-6l7 7M3 3l7 7m0 0V4m0 6H4m17-7l-7 7m0 0V4m0 6h6"></path>';
   } else {
-    icon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>';
+    icon.innerHTML =
+      '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>';
   }
 
-  document.getElementById("chart-fullscreen").setAttribute("aria-label",
-    isFullscreen ? TRANSLATIONS[currentLang].exitFullscreen : TRANSLATIONS[currentLang].fullscreen
-  );
+  document
+    .getElementById("chart-fullscreen")
+    .setAttribute(
+      "aria-label",
+      isFullscreen
+        ? TRANSLATIONS[currentLang].exitFullscreen
+        : TRANSLATIONS[currentLang].fullscreen,
+    );
 
   if (chart) {
     chart.resize();
@@ -221,28 +254,34 @@ function toggleChartFullscreen() {
 // --- Theme Management ---
 function updateThemeIcon() {
   const icon = document.getElementById("theme-icon");
-  const isDark = document.documentElement.getAttribute("data-theme") === "dark" ||
-    (currentTheme === 'system' && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const isDark =
+    document.documentElement.getAttribute("data-theme") === "dark" ||
+    (currentTheme === "system" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   if (isDark) {
     // Sun icon
-    icon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+    icon.innerHTML =
+      '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
   } else {
     // Moon icon
-    icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+    icon.innerHTML =
+      '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
   }
 
   // Update meta theme-color
-  const metaThemeColor = document.getElementById('theme-color-meta');
+  const metaThemeColor = document.getElementById("theme-color-meta");
   if (metaThemeColor) {
-    const bg = getComputedStyle(document.documentElement).getPropertyValue('--bg-color').trim();
-    metaThemeColor.setAttribute('content', bg);
+    const bg = getComputedStyle(document.documentElement)
+      .getPropertyValue("--bg-color")
+      .trim();
+    metaThemeColor.setAttribute("content", bg);
   }
 }
 
 function setTheme(theme) {
   currentTheme = theme;
-  if (theme === 'system') {
+  if (theme === "system") {
     document.documentElement.removeAttribute("data-theme");
     localStorage.removeItem("theme");
   } else {
@@ -253,10 +292,12 @@ function setTheme(theme) {
 }
 
 function toggleTheme() {
-  const isDark = document.documentElement.getAttribute("data-theme") === "dark" ||
-    (currentTheme === 'system' && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const isDark =
+    document.documentElement.getAttribute("data-theme") === "dark" ||
+    (currentTheme === "system" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
 
-  setTheme(isDark ? 'light' : 'dark');
+  setTheme(isDark ? "light" : "dark");
   if (chartData) renderChart(chartData);
 }
 
@@ -266,7 +307,7 @@ async function shareApp() {
   const shareData = {
     title: TRANSLATIONS[lang].shareTitle,
     text: TRANSLATIONS[lang].shareText,
-    url: window.location.href
+    url: window.location.href,
   };
 
   try {
@@ -317,17 +358,18 @@ function displayCurrentPrices(data) {
   const container = document.getElementById("current-prices");
   const currentGas = data.current.Gas;
   const previousGas = data.previous.Gas;
-  const locale = currentLang === 'pt' ? 'pt-PT' : 'en-GB';
+  const locale = currentLang === "pt" ? "pt-PT" : "en-GB";
   const startDate = new Date(data.current["Start date"]).toLocaleDateString(
-    locale, DATE_OPTIONS
+    locale,
+    DATE_OPTIONS,
   );
   const endDate = new Date(data.current["End date"]).toLocaleDateString(
-    locale, DATE_OPTIONS
+    locale,
+    DATE_OPTIONS,
   );
 
-  document.getElementById(
-    "current-prices-heading"
-  ).textContent = `${TRANSLATIONS[currentLang].currentPrices} • ${startDate} — ${endDate}`;
+  document.getElementById("current-prices-heading").textContent =
+    `${TRANSLATIONS[currentLang].currentPrices} • ${startDate} — ${endDate}`;
 
   let html = '<div class="price-cards">';
 
@@ -337,7 +379,7 @@ function displayCurrentPrices(data) {
     const previousPrice = previousGas[dataKey];
     const { current, icon, diffText, colorClass } = formatPriceDiff(
       price,
-      previousPrice
+      previousPrice,
     );
 
     html += `
@@ -358,14 +400,14 @@ function displayCurrentPrices(data) {
 function displayHistoricalTable(data) {
   const container = document.getElementById("historical-prices");
   const sortedDates = Object.keys(data).sort(
-    (a, b) => new Date(b) - new Date(a)
+    (a, b) => new Date(b) - new Date(a),
   );
 
   const totalPages = Math.ceil(sortedDates.length / itemsPerPage);
   const start = (currentPage - 1) * itemsPerPage;
   const end = start + itemsPerPage;
   const pagedDates = sortedDates.slice(start, end);
-  const locale = currentLang === 'pt' ? 'pt-PT' : 'en-GB';
+  const locale = currentLang === "pt" ? "pt-PT" : "en-GB";
 
   let html = `
     <div class="table-container">
@@ -382,7 +424,8 @@ function displayHistoricalTable(data) {
   for (const date of pagedDates) {
     const priceData = data[date];
     html += `<tr><td>${new Date(priceData["Start date"]).toLocaleDateString(
-      locale, DATE_OPTIONS
+      locale,
+      DATE_OPTIONS,
     )}</td>`;
     for (const fuelType of FUEL_TYPES) {
       const dataKey = DATA_KEY_MAPPING[fuelType] || fuelType;
@@ -396,27 +439,27 @@ function displayHistoricalTable(data) {
 
   // Pagination controls
   const pageInfo = TRANSLATIONS[currentLang].page
-    .replace('{current}', currentPage)
-    .replace('{total}', totalPages);
+    .replace("{current}", currentPage)
+    .replace("{total}", totalPages);
 
   html += `
     <div class="pagination">
-      <button class="pagination-btn" id="prev-page" ${currentPage === 1 ? 'disabled' : ''}>${TRANSLATIONS[currentLang].previous}</button>
+      <button class="pagination-btn" id="prev-page" ${currentPage === 1 ? "disabled" : ""}>${TRANSLATIONS[currentLang].previous}</button>
       <span class="page-info">${pageInfo}</span>
-      <button class="pagination-btn" id="next-page" ${currentPage === totalPages ? 'disabled' : ''}>${TRANSLATIONS[currentLang].next}</button>
+      <button class="pagination-btn" id="next-page" ${currentPage === totalPages ? "disabled" : ""}>${TRANSLATIONS[currentLang].next}</button>
     </div>
   `;
 
   container.innerHTML = html;
 
-  document.getElementById('prev-page').onclick = () => {
+  document.getElementById("prev-page").onclick = () => {
     if (currentPage > 1) {
       currentPage--;
       displayHistoricalTable(data);
     }
   };
 
-  document.getElementById('next-page').onclick = () => {
+  document.getElementById("next-page").onclick = () => {
     if (currentPage < totalPages) {
       currentPage++;
       displayHistoricalTable(data);
@@ -428,18 +471,22 @@ function renderChart(data) {
   const ctx = document.getElementById("priceHistoryChart").getContext("2d");
   const dates = Object.keys(data).sort((a, b) => new Date(a) - new Date(b));
 
-  const isDark = document.documentElement.getAttribute("data-theme") === "dark" ||
-    (currentTheme === 'system' && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const isDark =
+    document.documentElement.getAttribute("data-theme") === "dark" ||
+    (currentTheme === "system" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   const textColor = isDark ? "#9299a1" : "#636e72";
-  const gridColor = isDark ? "rgba(255, 255, 255, 0.05)" : "rgba(0, 0, 0, 0.05)";
-  const locale = currentLang === 'pt' ? 'pt-PT' : 'en-GB';
+  const gridColor = isDark
+    ? "rgba(255, 255, 255, 0.05)"
+    : "rgba(0, 0, 0, 0.05)";
+  const locale = currentLang === "pt" ? "pt-PT" : "en-GB";
 
   let datasets;
-  let chartType = 'line';
+  let chartType = "line";
 
-  if (chartStyle === 'candlestick') {
-    chartType = 'candlestick';
+  if (chartStyle === "candlestick") {
+    chartType = "candlestick";
     datasets = FUEL_TYPES.map((fuel) => {
       const color = COLORS[fuel].border;
       const dataKey = DATA_KEY_MAPPING[fuel] || fuel;
@@ -447,54 +494,57 @@ function renderChart(data) {
       return {
         label: TRANSLATIONS[currentLang].fuelTypes[fuel],
         data: dates.map((date, index) => {
-          const current = data[date].Gas?.[dataKey] || data[date].Fuel?.[dataKey];
-          const previous = index > 0
-            ? (data[dates[index-1]].Gas?.[dataKey] || data[dates[index-1]].Fuel?.[dataKey])
-            : current;
+          const current =
+            data[date].Gas?.[dataKey] || data[date].Fuel?.[dataKey];
+          const previous =
+            index > 0
+              ? data[dates[index - 1]].Gas?.[dataKey] ||
+                data[dates[index - 1]].Fuel?.[dataKey]
+              : current;
 
           return {
             x: new Date(date).getTime(),
             o: previous,
             h: Math.max(current, previous),
             l: Math.min(current, previous),
-            c: current
+            c: current,
           };
         }),
         color: {
-          up: '#00b894',
-          down: '#ff5252',
-          unchanged: '#636e72',
+          up: "#ff5252",
+          down: "#00b894",
+          unchanged: "#636e72",
         },
         borderColor: color,
       };
     });
   } else {
-    chartType = chartStyle === 'bar' ? 'bar' : 'line';
+    chartType = chartStyle === "bar" ? "bar" : "line";
     datasets = FUEL_TYPES.map((fuel) => {
       const color = COLORS[fuel].border;
       const dataKey = DATA_KEY_MAPPING[fuel] || fuel;
       const fuelData = dates.map(
-        (date) => data[date].Gas?.[dataKey] || data[date].Fuel?.[dataKey]
+        (date) => data[date].Gas?.[dataKey] || data[date].Fuel?.[dataKey],
       );
 
       const config = {
         label: TRANSLATIONS[currentLang].fuelTypes[fuel],
         data: fuelData,
         borderColor: color,
-        backgroundColor: chartStyle === 'bar' ? `${color}80` : 'transparent',
+        backgroundColor: chartStyle === "bar" ? `${color}80` : "transparent",
         borderWidth: 2,
         pointRadius: 0,
         pointHoverRadius: 6,
       };
 
-      if (chartStyle === 'line' || chartStyle === 'step') {
+      if (chartStyle === "line" || chartStyle === "step") {
         const gradient = ctx.createLinearGradient(0, 0, 0, 400);
         gradient.addColorStop(0, isDark ? `${color}33` : `${color}1A`);
-        gradient.addColorStop(1, 'transparent');
+        gradient.addColorStop(1, "transparent");
         config.backgroundColor = gradient;
         config.fill = true;
-        config.tension = chartStyle === 'step' ? 0 : 0.4;
-        config.stepped = chartStyle === 'step';
+        config.tension = chartStyle === "step" ? 0 : 0.4;
+        config.stepped = chartStyle === "step";
       }
 
       return config;
@@ -506,23 +556,28 @@ function renderChart(data) {
   const chartConfig = {
     type: chartType,
     data: {
-      labels: chartType === 'line' || chartType === 'bar' || chartType === 'step' ? dates.map((d) => new Date(d).toLocaleDateString(locale, DATE_OPTIONS)) : [],
+      labels:
+        chartType === "line" || chartType === "bar" || chartType === "step"
+          ? dates.map((d) =>
+              new Date(d).toLocaleDateString(locale, DATE_OPTIONS),
+            )
+          : [],
       datasets: datasets,
     },
     options: {
       animation: {
         duration: 1000,
-        easing: 'easeOutQuart'
+        easing: "easeOutQuart",
       },
       responsive: true,
       maintainAspectRatio: false,
       interaction: {
-        mode: chartStyle === 'candlestick' ? "nearest" : "index",
+        mode: chartStyle === "candlestick" ? "nearest" : "index",
         intersect: false,
       },
       scales: {
         x: {
-          type: chartStyle === 'candlestick' ? 'time' : 'category',
+          type: chartStyle === "candlestick" ? "time" : "category",
           grid: {
             display: false,
           },
@@ -530,11 +585,11 @@ function renderChart(data) {
             color: textColor,
             maxTicksLimit: 6,
             maxRotation: 0,
-            font: { size: 11 }
+            font: { size: 11 },
           },
           time: {
-            unit: 'month'
-          }
+            unit: "month",
+          },
         },
         y: {
           grid: {
@@ -544,7 +599,7 @@ function renderChart(data) {
           ticks: {
             color: textColor,
             callback: (value) => value.toFixed(2) + "€",
-            font: { size: 11 }
+            font: { size: 11 },
           },
         },
       },
@@ -552,17 +607,17 @@ function renderChart(data) {
         zoom: {
           pan: {
             enabled: true,
-            mode: 'x',
+            mode: "x",
           },
           zoom: {
             wheel: {
               enabled: true,
             },
             pinch: {
-              enabled: true
+              enabled: true,
             },
-            mode: 'x',
-          }
+            mode: "x",
+          },
         },
         legend: {
           position: "top",
@@ -574,9 +629,9 @@ function renderChart(data) {
             pointStyle: "circle",
             font: {
               size: 11,
-              weight: '600'
+              weight: "600",
             },
-            padding: 15
+            padding: 15,
           },
         },
         tooltip: {
@@ -591,17 +646,17 @@ function renderChart(data) {
           callbacks: {
             label: (context) => {
               const t = TRANSLATIONS[currentLang];
-              if (chartStyle === 'candlestick') {
+              if (chartStyle === "candlestick") {
                 const p = context.raw;
                 return [
                   ` ${context.dataset.label}`,
                   `  ${t.pastWeek}: ${p.o.toFixed(3)}€`,
-                  `  ${t.currentWeek}: ${p.c.toFixed(3)}€`
+                  `  ${t.currentWeek}: ${p.c.toFixed(3)}€`,
                 ];
               } else {
                 return ` ${context.dataset.label}: ${context.parsed.y.toFixed(3)}€`;
               }
-            }
+            },
           },
         },
       },
@@ -615,11 +670,11 @@ let chartData = null;
 
 async function init() {
   // Load saved theme or default to system
-  const savedTheme = localStorage.getItem("theme") || 'system';
+  const savedTheme = localStorage.getItem("theme") || "system";
   setTheme(savedTheme);
 
   // Load saved language or default to pt
-  const savedLang = localStorage.getItem("lang") || 'pt';
+  const savedLang = localStorage.getItem("lang") || "pt";
   setLanguage(savedLang);
 
   // Load saved chart style
@@ -630,19 +685,31 @@ async function init() {
   }
 
   // Setup listeners
-  document.getElementById("theme-toggle").addEventListener("click", toggleTheme);
+  document
+    .getElementById("theme-toggle")
+    .addEventListener("click", toggleTheme);
   document.getElementById("share-btn").addEventListener("click", shareApp);
-  document.getElementById("lang-toggle").addEventListener("click", toggleLanguage);
-  document.getElementById("chart-style-toggle").addEventListener("click", toggleChartStyle);
-  document.getElementById("chart-reset-zoom").addEventListener("click", resetChartZoom);
-  document.getElementById("chart-fullscreen").addEventListener("click", toggleChartFullscreen);
+  document
+    .getElementById("lang-toggle")
+    .addEventListener("click", toggleLanguage);
+  document
+    .getElementById("chart-style-toggle")
+    .addEventListener("click", toggleChartStyle);
+  document
+    .getElementById("chart-reset-zoom")
+    .addEventListener("click", resetChartZoom);
+  document
+    .getElementById("chart-fullscreen")
+    .addEventListener("click", toggleChartFullscreen);
 
-  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", () => {
-    if (currentTheme === 'system') {
-      updateThemeIcon();
-      if (chartData) renderChart(chartData);
-    }
-  });
+  window
+    .matchMedia("(prefers-color-scheme: dark)")
+    .addEventListener("change", () => {
+      if (currentTheme === "system") {
+        updateThemeIcon();
+        if (chartData) renderChart(chartData);
+      }
+    });
 
   try {
     const [currentData, historicalData] = await Promise.all([
@@ -675,7 +742,10 @@ if ("serviceWorker" in navigator) {
         registration.addEventListener("updatefound", () => {
           const newWorker = registration.installing;
           newWorker.addEventListener("statechange", () => {
-            if (newWorker.state === "installed" && navigator.serviceWorker.controller) {
+            if (
+              newWorker.state === "installed" &&
+              navigator.serviceWorker.controller
+            ) {
               // New content is available, show a subtle hint or auto-reload
               // For a "functional" feel, we can reload to ensure the latest version
               window.location.reload();
@@ -690,31 +760,31 @@ if ("serviceWorker" in navigator) {
 // PWA Install Handling
 let deferredPrompt;
 
-window.addEventListener('beforeinstallprompt', (e) => {
+window.addEventListener("beforeinstallprompt", (e) => {
   e.preventDefault();
   deferredPrompt = e;
-  const installBtn = document.getElementById('install-btn');
+  const installBtn = document.getElementById("install-btn");
   if (installBtn) {
-    installBtn.style.display = 'flex';
+    installBtn.style.display = "flex";
     // Add a subtle pulse animation if it's mobile
     if (window.innerWidth <= 600) {
-      installBtn.style.animation = 'pulse 2s infinite';
+      installBtn.style.animation = "pulse 2s infinite";
     }
   }
 });
 
-document.getElementById('install-btn').addEventListener('click', async () => {
+document.getElementById("install-btn").addEventListener("click", async () => {
   if (!deferredPrompt) return;
   deferredPrompt.prompt();
   const { outcome } = await deferredPrompt.userChoice;
-  if (outcome === 'accepted') {
-    document.getElementById('install-btn').style.display = 'none';
+  if (outcome === "accepted") {
+    document.getElementById("install-btn").style.display = "none";
   }
   deferredPrompt = null;
 });
 
-window.addEventListener('appinstalled', () => {
-  document.getElementById('install-btn').style.display = 'none';
+window.addEventListener("appinstalled", () => {
+  document.getElementById("install-btn").style.display = "none";
   deferredPrompt = null;
 });
 

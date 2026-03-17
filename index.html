@@ -1,23 +1,35 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <meta name="description" content="Consulte os preços atuais e o histórico de combustíveis na Região Autónoma da Madeira. Saiba se deve abastecer agora ou esperar." />
-    <meta name="theme-color" content="#ffffff" id="theme-color-meta">
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+    <meta
+      name="description"
+      content="Consulte os preços atuais e o histórico de combustíveis na Região Autónoma da Madeira. Saiba se deve abastecer agora ou esperar."
+    />
+    <meta name="theme-color" content="#ffffff" id="theme-color-meta" />
 
     <!-- iOS PWA tags -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="Devo Abastecer">
-    <link rel="apple-touch-icon" href="icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Devo Abastecer" />
+    <link rel="apple-touch-icon" href="icon.png" />
 
     <!-- OpenGraph tags -->
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="Devo Abastecer - Preços de Combustíveis na Madeira">
-    <meta property="og:description" content="Consulte os preços atuais e o histórico de combustíveis na Região Autónoma da Madeira. Saiba se deve abastecer agora ou esperar.">
-    <meta property="og:image" content="icon.png">
-    <meta property="og:url" content="https://gas.harryvasanth.com">
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Devo Abastecer - Preços de Combustíveis na Madeira"
+    />
+    <meta
+      property="og:description"
+      content="Consulte os preços atuais e o histórico de combustíveis na Região Autónoma da Madeira. Saiba se deve abastecer agora ou esperar."
+    />
+    <meta property="og:image" content="icon.png" />
+    <meta property="og:url" content="https://gas.harryvasanth.com" />
 
     <title>Devo Abastecer - Preços de Combustíveis na Madeira</title>
     <link rel="stylesheet" href="styles.css" />
@@ -37,14 +49,58 @@
           <button id="lang-toggle" class="icon-btn" aria-label="Mudar idioma">
             <span id="lang-icon">EN</span>
           </button>
-          <button id="install-btn" class="icon-btn" aria-label="Instalar App" style="display: none;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <button
+            id="install-btn"
+            class="icon-btn"
+            aria-label="Instalar App"
+            style="display: none"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
           </button>
           <button id="share-btn" class="icon-btn" aria-label="Partilhar">
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path><polyline points="16 6 12 2 8 6"></polyline><line x1="12" y1="2" x2="12" y2="15"></line></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+              <polyline points="16 6 12 2 8 6"></polyline>
+              <line x1="12" y1="2" x2="12" y2="15"></line>
+            </svg>
           </button>
           <button id="theme-toggle" class="icon-btn" aria-label="Mudar tema">
-            <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></svg>
+            <svg
+              id="theme-icon"
+              xmlns="http://www.w3.org/2000/svg"
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></svg>
           </button>
         </div>
       </div>
@@ -65,18 +121,79 @@
         <header class="section-header">
           <h2 id="history-heading">Histórico de Preços</h2>
           <div class="header-actions">
-            <button id="chart-reset-zoom" class="icon-btn" aria-label="Repor zoom">
-              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+            <button
+              id="chart-reset-zoom"
+              class="icon-btn"
+              aria-label="Repor zoom"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"
+                ></path>
+                <polyline points="3 3 3 8 8 8"></polyline>
+              </svg>
             </button>
-            <button id="chart-style-toggle" class="icon-btn" aria-label="Mudar estilo do gráfico">
-              <svg id="chart-style-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+            <button
+              id="chart-style-toggle"
+              class="icon-btn"
+              aria-label="Mudar estilo do gráfico"
+            >
+              <svg
+                id="chart-style-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <line x1="18" y1="20" x2="18" y2="10"></line>
+                <line x1="12" y1="20" x2="12" y2="4"></line>
+                <line x1="6" y1="20" x2="6" y2="14"></line>
+              </svg>
             </button>
-            <button id="chart-fullscreen" class="icon-btn" aria-label="Ecrã inteiro">
-              <svg id="fullscreen-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg>
+            <button
+              id="chart-fullscreen"
+              class="icon-btn"
+              aria-label="Ecrã inteiro"
+            >
+              <svg
+                id="fullscreen-icon"
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path
+                  d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"
+                ></path>
+              </svg>
             </button>
           </div>
         </header>
-        <div id="history-chart-container" role="region" aria-label="Gráfico de histórico de preços">
+        <div
+          id="history-chart-container"
+          role="region"
+          aria-label="Gráfico de histórico de preços"
+        >
           <canvas id="priceHistoryChart"></canvas>
         </div>
         <div id="historical-prices"></div>
@@ -84,7 +201,15 @@
     </main>
 
     <footer class="app-footer">
-      <p><span id="footer-update-text">Dados atualizados semanalmente • </span><a href="https://github.com/carlosrsabreu/devo-abastecer" target="_blank" rel="noopener">GitHub</a></p>
+      <p>
+        <span id="footer-update-text">Dados atualizados semanalmente • </span
+        ><a
+          href="https://github.com/carlosrsabreu/devo-abastecer"
+          target="_blank"
+          rel="noopener"
+          >GitHub</a
+        >
+      </p>
     </footer>
 
     <script src="app.js"></script>
