@@ -16,20 +16,20 @@ const DATA_KEY_MAPPING = {
 
 const COLORS = {
   "Gasolina IO95": {
-    border: "#0071e3",
+    border: "#0071e3", // System Blue
     bg: "rgba(0, 113, 227, 0.05)",
   },
   "Gasolina IO98": {
-    border: "#32d74b",
-    bg: "rgba(50, 215, 75, 0.05)",
+    border: "#34c759", // System Green
+    bg: "rgba(52, 199, 89, 0.05)",
   },
   "Gasóleo Rodoviário": {
-    border: "#ff453a",
-    bg: "rgba(255, 69, 58, 0.05)",
+    border: "#ff3b30", // System Red
+    bg: "rgba(255, 59, 48, 0.05)",
   },
   "Gasóleo Colorido": {
-    border: "#bf5af2",
-    bg: "rgba(191, 90, 242, 0.05)",
+    border: "#af52de", // System Purple
+    bg: "rgba(175, 82, 222, 0.05)",
   },
 };
 
@@ -383,7 +383,7 @@ function displayCurrentPrices(data) {
     );
 
     html += `
-      <div class="price-card">
+      <div class="price-card" onmousemove="this.style.setProperty('--mouse-x', event.offsetX + 'px'); this.style.setProperty('--mouse-y', event.offsetY + 'px');">
         <div class="fuel-type">${TRANSLATIONS[currentLang].fuelTypes[fuelType]}</div>
         <div class="price-value">
           <span class="main-price">${current}</span>
@@ -511,8 +511,8 @@ function renderChart(data) {
           };
         }),
         color: {
-          up: "#ff453a",
-          down: "#32d74b",
+          up: "#ff3b30",
+          down: "#34c759",
           unchanged: "#86868b",
         },
         borderColor: color,
