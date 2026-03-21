@@ -16,20 +16,20 @@ const DATA_KEY_MAPPING = {
 
 const COLORS = {
   "Gasolina IO95": {
-    border: "#0075eb",
-    bg: "rgba(0, 117, 235, 0.05)",
+    border: "#0071e3",
+    bg: "rgba(0, 113, 227, 0.05)",
   },
   "Gasolina IO98": {
-    border: "#00b894",
-    bg: "rgba(0, 184, 148, 0.05)",
+    border: "#32d74b",
+    bg: "rgba(50, 215, 75, 0.05)",
   },
   "Gasóleo Rodoviário": {
-    border: "#ff5252",
-    bg: "rgba(255, 82, 82, 0.05)",
+    border: "#ff453a",
+    bg: "rgba(255, 69, 58, 0.05)",
   },
   "Gasóleo Colorido": {
-    border: "#6c5ce7",
-    bg: "rgba(108, 92, 231, 0.05)",
+    border: "#bf5af2",
+    bg: "rgba(191, 90, 242, 0.05)",
   },
 };
 
@@ -511,9 +511,9 @@ function renderChart(data) {
           };
         }),
         color: {
-          up: "#ff5252",
-          down: "#00b894",
-          unchanged: "#636e72",
+          up: "#ff453a",
+          down: "#32d74b",
+          unchanged: "#86868b",
         },
         borderColor: color,
       };
@@ -773,6 +773,16 @@ async function init() {
   document
     .getElementById("chart-fullscreen")
     .addEventListener("click", toggleChartFullscreen);
+
+  // Scroll handler for navbar transparency
+  window.addEventListener("scroll", () => {
+    const header = document.querySelector(".app-header");
+    if (window.scrollY > 10) {
+      header.classList.add("scrolled");
+    } else {
+      header.classList.remove("scrolled");
+    }
+  });
 
   window
     .matchMedia("(prefers-color-scheme: dark)")
