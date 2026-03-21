@@ -10,16 +10,16 @@
   --transition-speed: 0.3s;
 
   /* Glass specific */
-  --surface-color: rgba(255, 255, 255, 0.7);
-  --header-bg: rgba(255, 255, 255, 0.75);
-  --card-bg: rgba(255, 255, 255, 0.4);
-  --border-color: rgba(0, 0, 0, 0.08);
+  --surface-color: rgba(255, 255, 255, 0.6);
+  --header-bg: rgba(255, 255, 255, 0.7);
+  --card-bg: rgba(255, 255, 255, 0.3);
+  --border-color: rgba(255, 255, 255, 0.4);
   --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-  --glass-blur: 12px;
+  --glass-blur: 20px;
 }
 
 [data-theme="dark"] {
-  --bg-color: #050505;
+  --bg-color: #000000;
   --text-color: #ffffff;
   --secondary-text: #a0a0a0;
   --accent-color: #0075eb;
@@ -28,16 +28,16 @@
   --equal-color: #636e72;
 
   /* Glass specific dark */
-  --surface-color: rgba(20, 20, 20, 0.6);
-  --header-bg: rgba(5, 5, 5, 0.75);
-  --card-bg: rgba(255, 255, 255, 0.03);
-  --border-color: rgba(255, 255, 255, 0.1);
-  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  --surface-color: rgba(15, 15, 15, 0.5);
+  --header-bg: rgba(0, 0, 0, 0.65);
+  --card-bg: rgba(255, 255, 255, 0.05);
+  --border-color: rgba(255, 255, 255, 0.15);
+  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 117, 235, 0.1);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg-color: #050505;
+    --bg-color: #000000;
     --text-color: #ffffff;
     --secondary-text: #a0a0a0;
     --accent-color: #0075eb;
@@ -46,11 +46,11 @@
     --equal-color: #636e72;
 
     /* Glass specific dark */
-    --surface-color: rgba(20, 20, 20, 0.6);
-    --header-bg: rgba(5, 5, 5, 0.75);
-    --card-bg: rgba(255, 255, 255, 0.03);
-    --border-color: rgba(255, 255, 255, 0.1);
-    --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+    --surface-color: rgba(15, 15, 15, 0.5);
+    --header-bg: rgba(0, 0, 0, 0.65);
+    --card-bg: rgba(255, 255, 255, 0.05);
+    --border-color: rgba(255, 255, 255, 0.15);
+    --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 117, 235, 0.1);
   }
 }
 
@@ -87,15 +87,38 @@ body::before {
   z-index: -1;
   background: radial-gradient(
       circle at 20% 20%,
-      rgba(0, 117, 235, 0.05) 0%,
+      rgba(0, 117, 235, 0.08) 0%,
       transparent 40%
     ),
     radial-gradient(
       circle at 80% 80%,
-      rgba(0, 184, 148, 0.05) 0%,
+      rgba(0, 184, 148, 0.08) 0%,
       transparent 40%
     );
   pointer-events: none;
+}
+
+.mouse-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(
+    circle,
+    rgba(0, 117, 235, 0.08) 0%,
+    rgba(0, 117, 235, 0) 70%
+  );
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: -1;
+  transform: translate(-50%, -50%);
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
+
+body:hover .mouse-glow {
+  opacity: 1;
 }
 
 [data-theme="dark"] body::before {
@@ -245,23 +268,45 @@ h2 {
   padding: 24px;
   border-radius: 16px;
   border: 1px solid var(--border-color);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+}
+
+.price-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.1),
+    transparent
+  );
+  transition: 0.5s;
+}
+
+.price-card:hover::before {
+  left: 100%;
 }
 
 .price-card:hover {
-  transform: translateY(-4px);
-  border-color: rgba(0, 117, 235, 0.4);
-  background: rgba(255, 255, 255, 0.85);
-  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.15);
+  transform: translateY(-6px);
+  border-color: rgba(0, 117, 235, 0.6);
+  background: rgba(255, 255, 255, 0.8);
+  box-shadow: 0 12px 48px 0 rgba(31, 38, 135, 0.2);
 }
 
 [data-theme="dark"] .price-card:hover {
-  background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.7);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 117, 235, 0.2);
 }
 
 .fuel-type {
@@ -368,8 +413,8 @@ h2 {
 
 .pagination-btn {
   background-color: var(--card-bg);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--border-color);
   color: var(--text-color);
   padding: 8px 16px;
@@ -515,4 +560,45 @@ tr:last-child td {
   border-radius: 20px;
   margin-top: 20px;
   border: 1px solid var(--border-color);
+}
+
+.glass-tooltip {
+  background: var(--surface-color);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  color: var(--text-color);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.glass-tooltip table {
+  margin: 0;
+  border-collapse: collapse;
+}
+
+.glass-tooltip th {
+  background: none;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.glass-tooltip td {
+  padding: 4px 8px;
+  font-size: 0.8rem;
+  border: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tooltip-key {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
 }

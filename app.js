@@ -635,27 +635,99 @@ function renderChart(data) {
           },
         },
         tooltip: {
-          backgroundColor: isDark ? "#111" : "#fff",
-          titleColor: isDark ? "#fff" : "#191c1f",
-          bodyColor: isDark ? "#9299a1" : "#636e72",
-          borderColor: gridColor,
-          borderWidth: 1,
-          padding: 12,
-          boxPadding: 6,
-          usePointStyle: true,
+          enabled: false,
+          external: function (context) {
+            // Tooltip Element
+            let tooltipEl = document.getElementById("chartjs-tooltip");
+
+            // Create element on first render
+            if (!tooltipEl) {
+              tooltipEl = document.createElement("div");
+              tooltipEl.id = "chartjs-tooltip";
+              tooltipEl.classList.add("glass-tooltip");
+              document.body.appendChild(tooltipEl);
+            }
+
+            // Hide if no tooltip
+            const tooltipModel = context.tooltip;
+            if (tooltipModel.opacity === 0) {
+              tooltipEl.style.opacity = 0;
+              return;
+            }
+
+            // Set caret Position
+            tooltipEl.classList.remove("above", "below", "no-transform");
+            if (tooltipModel.yAlign) {
+              tooltipEl.classList.add(tooltipModel.yAlign);
+            } else {
+              tooltipEl.classList.add("no-transform");
+            }
+
+            function getBody(bodyItem) {
+              return bodyItem.lines;
+            }
+
+            // Set Text
+            if (tooltipModel.body) {
+              const titleLines = tooltipModel.title || [];
+              const bodyLines = tooltipModel.body.map(getBody);
+
+              let innerHtml = "<thead>";
+
+              titleLines.forEach(function (title) {
+                innerHtml += "<tr><th>" + title + "</th></tr>";
+              });
+              innerHtml += "</thead><tbody>";
+
+              bodyLines.forEach(function (body, i) {
+                const colors = tooltipModel.labelColors[i];
+                const style = "background:" + colors.borderColor;
+                const span =
+                  '<span class="tooltip-key" style="' + style + '"></span>';
+                body.forEach((line) => {
+                  innerHtml += "<tr><td>" + span + line + "</td></tr>";
+                });
+              });
+              innerHtml += "</tbody>";
+
+              let tableRoot = tooltipEl.querySelector("table");
+              if (!tableRoot) {
+                tableRoot = document.createElement("table");
+                tooltipEl.appendChild(tableRoot);
+              }
+              tableRoot.innerHTML = innerHtml;
+            }
+
+            const position = context.chart.canvas.getBoundingClientRect();
+            const bodyFont = Chart.helpers.toFont(tooltipModel.options.bodyFont);
+
+            // Display, position, and set styles for font
+            tooltipEl.style.opacity = 1;
+            tooltipEl.style.position = "absolute";
+            tooltipEl.style.left =
+              position.left + window.scrollX + tooltipModel.caretX + "px";
+            tooltipEl.style.top =
+              position.top + window.scrollY + tooltipModel.caretY + "px";
+            tooltipEl.style.font = bodyFont.string;
+            tooltipEl.style.padding =
+              tooltipModel.padding + "px " + tooltipModel.padding + "px";
+            tooltipEl.style.pointerEvents = "none";
+            tooltipEl.style.transform =
+              "translate(-50%, -100%) translateY(-10px)";
+            tooltipEl.style.transition = "all 0.1s ease";
+          },
           callbacks: {
-            label: (context) => {
-              const t = TRANSLATIONS[currentLang];
+            label: function (context) {
               if (chartStyle === "candlestick") {
                 const p = context.raw;
                 return [
-                  ` ${context.dataset.label}`,
-                  `  ${t.pastWeek}: ${p.o.toFixed(3)}€`,
-                  `  ${t.currentWeek}: ${p.c.toFixed(3)}€`,
+                  `${TRANSLATIONS[currentLang].pastWeek}: ${p.o.toFixed(3)}€`,
+                  `${TRANSLATIONS[currentLang].currentWeek}: ${p.c.toFixed(3)}€`,
                 ];
-              } else {
-                return ` ${context.dataset.label}: ${context.parsed.y.toFixed(3)}€`;
               }
+              return (
+                context.dataset.label + ": " + context.parsed.y.toFixed(3) + "€"
+              );
             },
           },
         },
@@ -786,6 +858,21 @@ document.getElementById("install-btn").addEventListener("click", async () => {
 window.addEventListener("appinstalled", () => {
   document.getElementById("install-btn").style.display = "none";
   deferredPrompt = null;
+});
+
+// Mouse Glow Tracking
+document.addEventListener("mousemove", (e) => {
+  const glow = document.getElementById("mouse-glow");
+  if (glow) {
+    glow.style.left = `${e.clientX}px`;
+    glow.style.top = `${e.clientY}px`;
+    if (glow.style.opacity !== "1") glow.style.opacity = "1";
+  }
+});
+
+document.addEventListener("mouseleave", () => {
+  const glow = document.getElementById("mouse-glow");
+  if (glow) glow.style.opacity = "0";
 });
 
 init();
