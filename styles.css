@@ -10,47 +10,47 @@
   --transition-speed: 0.3s;
 
   /* Glass specific */
-  --surface-color: rgba(255, 255, 255, 0.6);
-  --header-bg: rgba(255, 255, 255, 0.7);
-  --card-bg: rgba(255, 255, 255, 0.3);
-  --border-color: rgba(255, 255, 255, 0.4);
-  --shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-  --glass-blur: 20px;
+  --surface-color: rgba(255, 255, 255, 0.4);
+  --header-bg: rgba(255, 255, 255, 0.6);
+  --card-bg: rgba(255, 255, 255, 0.2);
+  --border-color: rgba(255, 255, 255, 0.3);
+  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+  --glass-blur: 24px;
 }
 
 [data-theme="dark"] {
-  --bg-color: #000000;
-  --text-color: #ffffff;
-  --secondary-text: #a0a0a0;
-  --accent-color: #0075eb;
+  --bg-color: #050505;
+  --text-color: #f5f5f7;
+  --secondary-text: #86868b;
+  --accent-color: #0071e3;
   --up-color: #ff453a;
   --down-color: #32d74b;
-  --equal-color: #636e72;
+  --equal-color: #86868b;
 
   /* Glass specific dark */
-  --surface-color: rgba(15, 15, 15, 0.5);
-  --header-bg: rgba(0, 0, 0, 0.65);
-  --card-bg: rgba(255, 255, 255, 0.05);
-  --border-color: rgba(255, 255, 255, 0.15);
-  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 117, 235, 0.1);
+  --surface-color: rgba(25, 25, 25, 0.4);
+  --header-bg: rgba(5, 5, 5, 0.6);
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --border-color: rgba(255, 255, 255, 0.1);
+  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --bg-color: #000000;
-    --text-color: #ffffff;
-    --secondary-text: #a0a0a0;
-    --accent-color: #0075eb;
+    --bg-color: #050505;
+    --text-color: #f5f5f7;
+    --secondary-text: #86868b;
+    --accent-color: #0071e3;
     --up-color: #ff453a;
     --down-color: #32d74b;
-    --equal-color: #636e72;
+    --equal-color: #86868b;
 
     /* Glass specific dark */
-    --surface-color: rgba(15, 15, 15, 0.5);
-    --header-bg: rgba(0, 0, 0, 0.65);
-    --card-bg: rgba(255, 255, 255, 0.05);
-    --border-color: rgba(255, 255, 255, 0.15);
-    --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 117, 235, 0.1);
+    --surface-color: rgba(25, 25, 25, 0.4);
+    --header-bg: rgba(5, 5, 5, 0.6);
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --border-color: rgba(255, 255, 255, 0.1);
+    --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -139,6 +139,14 @@ body:hover .mouse-glow {
   position: sticky;
   top: 0;
   z-index: 110;
+  background-color: transparent;
+  backdrop-filter: blur(0px);
+  -webkit-backdrop-filter: blur(0px);
+  border-bottom: 1px solid transparent;
+  transition: all 0.4s ease;
+}
+
+.app-header.scrolled {
   background-color: var(--header-bg);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -298,15 +306,19 @@ h2 {
 }
 
 .price-card:hover {
-  transform: translateY(-6px);
-  border-color: rgba(0, 117, 235, 0.6);
-  background: rgba(255, 255, 255, 0.8);
-  box-shadow: 0 12px 48px 0 rgba(31, 38, 135, 0.2);
+  transform: translateY(-4px);
+  border-color: var(--accent-color);
+  background: var(--surface-color);
+  box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.15);
 }
 
 [data-theme="dark"] .price-card:hover {
-  background: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 117, 235, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.6);
+}
+
+.price-card:active {
+  transform: translateY(-2px) scale(0.98);
 }
 
 .fuel-type {
@@ -510,7 +522,7 @@ tr:last-child td {
 .price-card,
 #history-chart-container,
 .table-container {
-  animation: fadeIn 0.5s ease-out forwards;
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @media (max-width: 600px) {
