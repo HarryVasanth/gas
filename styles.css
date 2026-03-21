@@ -10,12 +10,12 @@
   --transition-speed: 0.3s;
 
   /* Glass specific */
-  --surface-color: rgba(255, 255, 255, 0.4);
-  --header-bg: rgba(255, 255, 255, 0.6);
-  --card-bg: rgba(255, 255, 255, 0.2);
-  --border-color: rgba(255, 255, 255, 0.3);
-  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
-  --glass-blur: 24px;
+  --surface-color: rgba(255, 255, 255, 0.3);
+  --header-bg: rgba(255, 255, 255, 0.5);
+  --card-bg: rgba(255, 255, 255, 0.15);
+  --border-color: rgba(255, 255, 255, 0.25);
+  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.05);
+  --glass-blur: 40px;
 }
 
 [data-theme="dark"] {
@@ -28,11 +28,11 @@
   --equal-color: #86868b;
 
   /* Glass specific dark */
-  --surface-color: rgba(25, 25, 25, 0.4);
-  --header-bg: rgba(5, 5, 5, 0.6);
-  --card-bg: rgba(255, 255, 255, 0.03);
-  --border-color: rgba(255, 255, 255, 0.1);
-  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+  --surface-color: rgba(20, 20, 20, 0.3);
+  --header-bg: rgba(5, 5, 5, 0.5);
+  --card-bg: rgba(255, 255, 255, 0.02);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -85,16 +85,12 @@ body::before {
   right: 0;
   bottom: 0;
   z-index: -1;
-  background: radial-gradient(
-      circle at 20% 20%,
-      rgba(0, 117, 235, 0.08) 0%,
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at 80% 80%,
-      rgba(0, 184, 148, 0.08) 0%,
-      transparent 40%
-    );
+  background:
+    radial-gradient(circle at 10% 10%, rgba(0, 113, 227, 0.06) 0%, transparent 35%),
+    radial-gradient(circle at 90% 10%, rgba(50, 215, 75, 0.04) 0%, transparent 35%),
+    radial-gradient(circle at 50% 50%, rgba(94, 92, 230, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 10% 90%, rgba(255, 69, 58, 0.04) 0%, transparent 35%),
+    radial-gradient(circle at 90% 90%, rgba(0, 113, 227, 0.06) 0%, transparent 35%);
   pointer-events: none;
 }
 
@@ -102,18 +98,18 @@ body::before {
   position: fixed;
   top: 0;
   left: 0;
-  width: 500px;
-  height: 500px;
+  width: 600px;
+  height: 600px;
   background: radial-gradient(
     circle,
-    rgba(0, 117, 235, 0.08) 0%,
-    rgba(0, 117, 235, 0) 70%
+    rgba(0, 113, 227, 0.06) 0%,
+    rgba(0, 113, 227, 0) 70%
   );
   border-radius: 50%;
   pointer-events: none;
   z-index: -1;
   transform: translate(-50%, -50%);
-  transition: opacity 0.3s ease;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   opacity: 0;
 }
 
@@ -122,16 +118,12 @@ body:hover .mouse-glow {
 }
 
 [data-theme="dark"] body::before {
-  background: radial-gradient(
-      circle at 20% 20%,
-      rgba(0, 117, 235, 0.1) 0%,
-      transparent 40%
-    ),
-    radial-gradient(
-      circle at 80% 80%,
-      rgba(50, 215, 75, 0.08) 0%,
-      transparent 40%
-    );
+  background:
+    radial-gradient(circle at 15% 15%, rgba(0, 113, 227, 0.12) 0%, transparent 40%),
+    radial-gradient(circle at 85% 15%, rgba(50, 215, 75, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 50% 50%, rgba(94, 92, 230, 0.06) 0%, transparent 60%),
+    radial-gradient(circle at 15% 85%, rgba(255, 69, 58, 0.08) 0%, transparent 40%),
+    radial-gradient(circle at 85% 85%, rgba(0, 113, 227, 0.12) 0%, transparent 40%);
 }
 
 /* Header */
@@ -288,33 +280,44 @@ h2 {
 .price-card::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.1),
-    transparent
+  inset: 0;
+  background: radial-gradient(
+    800px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+    rgba(255, 255, 255, 0.06),
+    transparent 40%
   );
-  transition: 0.5s;
+  opacity: 0;
+  transition: opacity 0.5s;
+  pointer-events: none;
+}
+
+[data-theme="dark"] .price-card::before {
+  background: radial-gradient(
+    800px circle at var(--mouse-x, 0) var(--mouse-y, 0),
+    rgba(255, 255, 255, 0.04),
+    transparent 40%
+  );
 }
 
 .price-card:hover::before {
-  left: 100%;
+  opacity: 1;
 }
 
 .price-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--accent-color);
+  transform: translateY(-6px);
+  border-color: rgba(0, 113, 227, 0.4);
   background: var(--surface-color);
-  box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.15);
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.1),
+    0 0 20px rgba(0, 113, 227, 0.1);
 }
 
 [data-theme="dark"] .price-card:hover {
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: 0 12px 48px 0 rgba(0, 0, 0, 0.6);
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(0, 113, 227, 0.5);
+  box-shadow:
+    0 12px 48px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(0, 113, 227, 0.2);
 }
 
 .price-card:active {
